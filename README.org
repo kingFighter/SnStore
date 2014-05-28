@@ -1,0 +1,9 @@
+SnStore is an in-memory database which borrows the idea,"shared
+nothing", from HSTORE.
+
+For simplicity, it can be a Key-Value store with "get"/"getRange" and
+"put" interface. NO SQL queries are requested.
+
+The DB is built on a single multi-core machine.
+
+Every thread is responsible for a partition of the whole key range.
