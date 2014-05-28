@@ -1,0 +1,9 @@
+# VS 
+*.sws
+*.sdf
+*.sln
+*.opensdf
+*.suo
+*.vcxproj*
+Debug
+ipch
