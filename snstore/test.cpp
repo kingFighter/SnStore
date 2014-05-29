@@ -3,6 +3,8 @@
 #include <vector>
 #include <cstdlib>
 #include <algorithm> 
+#include <ctime>
+
 #ifdef _WIN32
 #include <windows.h> 
 #endif
@@ -24,6 +26,7 @@ int main() {
   vector<int> dbKey;
   vector<string> dbValue;
   const int NUM = 10;
+  const int SENUM = 20;
   /*  srand(time(NULL));*/
   cout << "Generate Random db key and values.\n";
   for (int i = 0; i < NUM; ++i) {
@@ -32,6 +35,7 @@ int main() {
     dbValue.push_back(genRandomString(len));
     dbKV.push_back(make_pair(dbKey[i], dbValue[i]));
   }
+  cout << string(SENUM, '*') << endl << endl;
 
   SnStore db; 
   vector<pair<int, string> >::const_iterator it;
@@ -39,6 +43,9 @@ int main() {
     db.put(it->first, it->second);
 
   bool allPassed = true;
+  cout << string(SENUM, '*') << endl;
+  cout << "Test Correctness.\n";
+  cout << string(SENUM, '-') << endl;
   cout << "Test put&get functions: \n";
   bool passed = true;
   for (it = dbKV.begin(); it != dbKV.end(); it++) {
@@ -52,7 +59,9 @@ int main() {
     failRed("Test put&get functions failed.\n");
     allPassed = false;
   }
-  
+  cout << string(SENUM, '-') << endl << endl;
+
+  cout << string(SENUM, '-') << endl;
   cout << "Test getRange function: \n";
   passed = true;
   int minKey = *min_element(dbKey.begin(),dbKey.end());
@@ -67,12 +76,54 @@ int main() {
     failRed("Test getRange function failed.\n");
     allPassed = false;
   }
-
+  cout << string(SENUM, '-') << endl << endl;
+  
   if (allPassed) {
     passGreen("Test All passed.\n");
   } else {
     failRed("Test All failed.\n");
   }
+  cout << string(SENUM, '*') << endl << endl;
+
+  // Performance Test
+  SnStore dbPer; 
+  clock_t start, finish;
+  double totalTime;
+  cout << string(SENUM, '*') << endl;
+  cout << "Test Performance.\n";
+  cout << string(SENUM, '-') << endl;
+  const int TEST_NUM = 100;
+  cout << "Test put performance with " << TEST_NUM << " :\n";
+  start = clock();
+  for (int i = 0; i < TEST_NUM; ++i) {
+    string value = genRandomString(rand() % 20 + 1);
+    dbPer.put(i, value);
+  }
+  finish = clock();
+  totalTime = (double)(finish - start) / CLOCKS_PER_SEC;
+  cout << "Time: " << totalTime << "s\n";
+  cout << string(SENUM, '-') << endl << endl;
+
+  cout << string(SENUM, '-') << endl;
+  cout << "Test get performance with " << TEST_NUM << " :\n";
+  start = clock();
+  for (int i = 0; i < TEST_NUM; ++i) {
+    dbPer.get(i);
+  }
+  finish = clock();
+  totalTime = (double)(finish - start) / CLOCKS_PER_SEC;
+  cout << "Time: " << totalTime << "s\n";
+  cout << string(SENUM, '-') << endl << endl;
+
+  cout << string(SENUM, '-') << endl;
+  cout << "Test getRange performance with " << TEST_NUM << " :\n";
+  start = clock();
+  dbPer.getRange(0, TEST_NUM - 1);
+  finish = clock();
+  totalTime = (double)(finish - start) / CLOCKS_PER_SEC;
+  cout << "Time: " << totalTime << "s\n";
+  cout << string(SENUM, '-') << endl << endl;
+
   return 0;
 }
 
