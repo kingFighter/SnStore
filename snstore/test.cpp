@@ -2,11 +2,11 @@
 #include <string>
 #include <vector>
 #include <cstdlib>
-#include <algorithm> 
+#include <algorithm>
 #include <ctime>
 
 #ifdef _WIN32
-#include <windows.h> 
+#include <windows.h>
 #endif
 #include "snstore.h"
 
@@ -37,7 +37,7 @@ int main() {
   }
   cout << string(SENUM, '*') << endl << endl;
 
-  SnStore db; 
+  SnStore db;
   vector<pair<int, string> >::const_iterator it;
   for (it = dbKV.begin(); it != dbKV.end(); it++)
     db.put(it->first, it->second);
@@ -77,7 +77,7 @@ int main() {
     allPassed = false;
   }
   cout << string(SENUM, '-') << endl << endl;
-  
+
   if (allPassed) {
     passGreen("Test All passed.\n");
   } else {
@@ -86,7 +86,7 @@ int main() {
   cout << string(SENUM, '*') << endl << endl;
 
   // Performance Test
-  SnStore dbPer; 
+  SnStore dbPer;
   clock_t start, finish;
   double totalTime;
   cout << string(SENUM, '*') << endl;
@@ -145,11 +145,11 @@ string genRandomString(const int len) {
     "0123456789"
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     "abcdefghijklmnopqrstuvwxyz";
-  
+
   string str;
-  for (int i = 0; i < len; ++i) 
+  for (int i = 0; i < len; ++i)
     str.push_back(alphanum[rand() % (sizeof(alphanum) - 1)]);
-  
+
   return str;
 }
 void colorOut(int winColor, int otherColor, const string& msg) {
@@ -163,7 +163,7 @@ void colorOut(int winColor, int otherColor, const string& msg) {
   cout << msg;
   // reset
   SetConsoleTextAttribute(hConsole, consoleInfo.wAttributes);
-#elif 
+#else
   cout << "\033[1;" << otherColor << "m" << msg << "\033[0m\n";
 #endif
 

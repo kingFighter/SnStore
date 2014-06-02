@@ -7,3 +7,7 @@
 *.vcxproj*
 Debug
 ipch
+snstore/bin/
+snstore/obj/
+snstore/snstore.cbp
+snstore/snstore.depend
