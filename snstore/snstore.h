@@ -7,6 +7,7 @@ using namespace std;
 namespace Kevin {
   class SnStore {
   public:
+    SnStore();
     string get(int key);
     void put(int key, string value);
     vector<string> getRange(int minKey, int maxKey);

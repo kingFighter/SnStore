@@ -7,3 +7,8 @@ For simplicity, it can be a Key-Value store with "get"/"getRange" and
 The DB is built on a single multi-core machine.
 
 Every thread is responsible for a partition of the whole key range.
+
+
+Code Blocks Config
+follow the instruction http://www.deltavsoft.com/RCFProto/distro/unix/cpp.html
+set -DRCF_USE_ZLIB -DRCF_USE_OPENSSL -I../src -I../src/RCF/include -lpthread -lprotobuf -ldl
