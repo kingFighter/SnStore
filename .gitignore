@@ -9,5 +9,6 @@ Debug
 ipch
 snstore/bin/
 snstore/obj/
-snstore/snstore.cbp
-snstore/snstore.depend
+snstore.cbp
+snstore.depend
+snstore.layout

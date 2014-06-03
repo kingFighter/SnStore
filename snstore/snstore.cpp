@@ -12,3 +12,4 @@ vector<string> SnStore::getRange(int minKey, int maxKey) {
     vector<string> v;
     return v;
 }
+
