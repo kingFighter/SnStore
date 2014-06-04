@@ -29,6 +29,11 @@ int main() {
     db.put(4,"5");
     cout<<db.get(1);
     db.getRange(1,3);
+
+    db.beginTx();
+    db.get(1);
+    db.put(2, "2");
+    db.commit();
 //  vector<pair<int, string> > dbKV;
 //  vector<int> dbKey;
 //  vector<string> dbValue;

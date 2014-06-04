@@ -43,3 +43,22 @@ Coordinator::getrange(RpcController * controller, const GRRequest * request, GRR
     }
     done->Run();
 }
+void
+Coordinator::execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done)
+{
+    string args = request->args();
+    //parse the args into several req
+    char* req;
+    char* tx_args_c = new char[args.length() + 1];
+    strcpy(tx_args_c, args.c_str());
+    req = strtok(tx_args_c, ";");
+    while(req != NULL)//handle every request
+    {
+        std::cout<<req<<std::endl;
+        req = strtok(NULL, ";");
+        TxResponse_map* map = response->add_retvalue();
+        map->set_key(1);
+        map->set_value("2");
+    }
+    done->Run();
+}

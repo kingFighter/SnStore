@@ -29,9 +29,22 @@ message GRResponse {
 	repeated string value = 2;
 }
 
+message TxRequest {
+	required string args = 1;
+}
+
+message TxResponse {
+	message map {
+		required int32 key = 1;
+		required string value = 2;
+	}
+	repeated map retValue = 1;
+}
+
 service DbService
 {
 	rpc get(GetRequest) returns (GetResponse);
 	rpc put(PutRequest) returns (PutResponse);
 	rpc getrange(GRRequest) returns (GRResponse);
+	rpc execTx(TxRequest) returns (TxResponse);
 }
