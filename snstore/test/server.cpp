@@ -1,7 +1,7 @@
-#include "coordinator.h"
+#include "../src/server/coordinator.h"
 
 int main() {
-    Coordinator coor;
+    Coordinator coor(1,1);//initial for test
     try
     {
         // Initialize RCFProto.

@@ -8,7 +8,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
-#include "snstore.h"
+#include "../src/client/snstore.h"
 
 
 using namespace std;

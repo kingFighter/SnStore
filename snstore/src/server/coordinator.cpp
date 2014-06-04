@@ -2,6 +2,15 @@
 
 std::map<int,std::string> db;
 
+Coordinator::Coordinator(int worker_num, int max_key)
+{
+
+}
+
+Coordinator::~Coordinator()
+{
+}
+
 void
 Coordinator::get(RpcController * controller, const GetRequest * request, GetResponse * response, Closure * done)
 {

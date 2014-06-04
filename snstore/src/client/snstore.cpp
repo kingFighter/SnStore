@@ -1,6 +1,6 @@
 #include "snstore.h"
 #include <RCFProto.hpp>
-#include "snstore.pb.h"
+#include "../RCFProto/snstore.pb.h"
 #include <google/protobuf/text_format.h>
 
 using namespace Kevin;
