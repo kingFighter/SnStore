@@ -5,7 +5,7 @@
 
 using namespace std;
 namespace Kevin {
-  class SnStore {
+  class SnStore 
   public:
     SnStore();
     string get(int key);
