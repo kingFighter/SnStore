@@ -25,6 +25,8 @@ void SnStore::beginTx()
 
 void SnStore::commit()
 {
+    if (!tx)
+        return;
     tx = false;
     std::cout<<tx_args<<std::endl;
 
