@@ -6,6 +6,7 @@
 #include "../RCFProto/snstore.pb.h"
 #include <google/protobuf/text_format.h>
 #include <sstream>
+#include "../utility/debug.h"
 
 using namespace std;
 namespace Kevin {

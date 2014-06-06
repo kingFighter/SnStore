@@ -54,7 +54,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
     req = strtok(tx_args_c, ";");
     while(req != NULL)//handle every request
     {
-        std::cout<<req<<std::endl;
+      Debug(req<<std::endl);
         req = strtok(NULL, ";");
         TxResponse_map* map = response->add_retvalue();
         map->set_key(1);

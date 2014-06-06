@@ -12,7 +12,7 @@ SnStore::SnStore() {
     }
     catch(const RCF::Exception & e)
     {
-        std::cout << "RCF::Exception: " << e.getErrorString() << std::endl;
+      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         return ;
     }
 }
@@ -28,7 +28,7 @@ void SnStore::commit()
     if (!tx)
         return;
     tx = false;
-    std::cout<<tx_args<<std::endl;
+    Debug(tx_args<<std::endl);
 
     //call rpc to execute transaction
     try
@@ -42,8 +42,8 @@ void SnStore::commit()
 
         std::string strRequest;
         TextFormat::PrintToString(request, &strRequest);
-        std::cout << "Sending request:" << std::endl;
-        std::cout << strRequest << std::endl;
+        Debug("Sending request:" << std::endl);
+        Debug("strRequest << std::endl");
 
         // Make a synchronous remote call to server.
         stub.execTx(NULL,&request, &response, NULL);
@@ -51,17 +51,17 @@ void SnStore::commit()
         // Print out response.
         std::string strResponse;
         TextFormat::PrintToString(response, &strResponse);
-        std::cout << "Received response:" << std::endl;
-        std::cout << strResponse << std::endl;
+        Debug("Received response:" << std::endl);
+        Debug(strResponse << std::endl);
 
         RepeatedPtrField<TxResponse_map> rst = response.retvalue();
         RepeatedPtrField<TxResponse_map>::iterator it = rst.begin();
         for(; it != rst.end(); it++)
-            std::cout<<it->key()<<","<<it->value()<<std::endl;
+          Debug(it->key()<<","<<it->value()<<std::endl);
     }
     catch(const RCF::Exception & e)
     {
-        std::cout << "RCF::Exception: " << e.getErrorString() << std::endl;
+      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         return ;
     }
 
@@ -88,8 +88,8 @@ string SnStore::get(int key) {
 
         std::string strRequest;
         TextFormat::PrintToString(request, &strRequest);
-        std::cout << "Sending request:" << std::endl;
-        std::cout << strRequest << std::endl;
+        Debug("Sending request:" << std::endl);
+        Debug(strRequest << std::endl);
 
         // Make a synchronous remote call to server.
         stub.get(NULL,&request, &response, NULL);
@@ -97,13 +97,13 @@ string SnStore::get(int key) {
         // Print out response.
         std::string strResponse;
         TextFormat::PrintToString(response, &strResponse);
-        std::cout << "Received response:" << std::endl;
-        std::cout << strResponse << std::endl;
+        Debug("Received response:" << std::endl);
+        Debug(strResponse << std::endl);
         return response.value();
     }
     catch(const RCF::Exception & e)
     {
-        std::cout << "RCF::Exception: " << e.getErrorString() << std::endl;
+      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         return "";
     }
 }
@@ -131,8 +131,8 @@ void SnStore::put(int key, string value) {
 
         std::string strRequest;
         TextFormat::PrintToString(request, &strRequest);
-        std::cout << "Sending request:" << std::endl;
-        std::cout << strRequest << std::endl;
+        Debug("Sending request:" << std::endl);
+        Debug(strRequest << std::endl);
 
         // Make a synchronous remote call to server.
         stub.put(NULL,&request, &rsponse, NULL);
@@ -140,12 +140,12 @@ void SnStore::put(int key, string value) {
         // Print out response.
         std::string strResponse;
         TextFormat::PrintToString(rsponse, &strResponse);
-        std::cout << "Received response:" << std::endl;
-        std::cout << strResponse << std::endl;
+        Debug("Received response:" << std::endl);
+        Debug(strResponse << std::endl);
     }
     catch(const RCF::Exception & e)
     {
-        std::cout << "RCF::Exception: " << e.getErrorString() << std::endl;
+      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         return ;
     }
 }
@@ -173,17 +173,16 @@ vector<string> SnStore::getRange(int minKey, int maxKey) {
 
         std::string strRequest;
         TextFormat::PrintToString(request, &strRequest);
-        std::cout << "Sending request:" << std::endl;
-        std::cout << strRequest << std::endl;
-
+        Debug("Sending request:" << std::endl);
+        Debug(strRequest << std::endl);
         // Make a synchronous remote call to server.
         stub.getrange(NULL,&request, &rsponse, NULL);
 
         // Print out response.
         std::string strResponse;
         TextFormat::PrintToString(rsponse, &strResponse);
-        std::cout << "Received response:" << std::endl;
-        std::cout << strResponse << std::endl;
+        Debug("Received response:" << std::endl);
+        Debug(strResponse << std::endl);
         RepeatedPtrField< ::std::string> rst = rsponse.value();
         RepeatedPtrField< ::std::string>::iterator it = rst.begin();
         for(; it != rst.end(); it++)
@@ -192,7 +191,7 @@ vector<string> SnStore::getRange(int minKey, int maxKey) {
     }
     catch(const RCF::Exception & e)
     {
-        std::cout << "RCF::Exception: " << e.getErrorString() << std::endl;
+      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         return v;
     }
     return v;
