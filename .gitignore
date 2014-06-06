@@ -8,7 +8,11 @@
 Debug
 ipch
 snstore/bin/
+bin
 snstore/obj/
+obj
 snstore.cbp
+SnStore.cbp
 snstore.depend
+SnStore.depend
 snstore.layout
