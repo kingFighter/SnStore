@@ -5,7 +5,6 @@ using namespace google::protobuf;
 
 SnStore::SnStore() {
     tx = false;
-    tx_args = "";
     try
     {
         RCF::init();
@@ -20,7 +19,6 @@ SnStore::SnStore() {
 void SnStore::beginTx()
 {
     tx = true;
-    tx_args = "";
 }
 
 void SnStore::commit()
@@ -33,20 +31,17 @@ void SnStore::commit()
     //call rpc to execute transaction
     try
     {
-        TxRequest request;
-        request.set_args(tx_args);
-
         TxResponse response;
         RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
         DbService::Stub stub(&channel);
 
         std::string strRequest;
-        TextFormat::PrintToString(request, &strRequest);
+        TextFormat::PrintToString(current_request, &strRequest);
         Debug("Sending request:" << std::endl);
         Debug("strRequest << std::endl");
 
         // Make a synchronous remote call to server.
-        stub.execTx(NULL,&request, &response, NULL);
+        stub.execTx(NULL,&current_request, &response, NULL);
 
         // Print out response.
         std::string strResponse;
@@ -54,8 +49,8 @@ void SnStore::commit()
         Debug("Received response:" << std::endl);
         Debug(strResponse << std::endl);
 
-        RepeatedPtrField<TxResponse_map> rst = response.retvalue();
-        RepeatedPtrField<TxResponse_map>::iterator it = rst.begin();
+        RepeatedPtrField<TxResponse_Map> rst = response.retvalue();
+        RepeatedPtrField<TxResponse_Map>::iterator it = rst.begin();
         for(; it != rst.end(); it++)
           Debug(it->key()<<","<<it->value()<<std::endl);
     }
@@ -65,41 +60,38 @@ void SnStore::commit()
         return ;
     }
 
-
-    tx_args = "";
 }
 
 string SnStore::get(int key) {
+    TxRequest_Request * req = current_request.add_reqs();
+    req->set_op(TxRequest_Request::GET);
+    req->set_key1(key);
     if (tx)
     {
-        std::ostringstream oss;
-        oss<<key;
-        tx_args += "get " + oss.str() + ";";
         return "";
     }
     try
     {
-        GetRequest request;
-        request.set_key(key);
-
-        GetResponse response;
+        TxResponse response;
         RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
         DbService::Stub stub(&channel);
 
         std::string strRequest;
-        TextFormat::PrintToString(request, &strRequest);
+        TextFormat::PrintToString(current_request, &strRequest);
         Debug("Sending request:" << std::endl);
         Debug(strRequest << std::endl);
 
         // Make a synchronous remote call to server.
-        stub.get(NULL,&request, &response, NULL);
+        stub.execTx(NULL,&current_request, &response, NULL);
 
         // Print out response.
         std::string strResponse;
         TextFormat::PrintToString(response, &strResponse);
         Debug("Received response:" << std::endl);
         Debug(strResponse << std::endl);
-        return response.value();
+        RepeatedPtrField<TxResponse_Map> ret = response.retvalue();
+        RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
+        return it->value();
     }
     catch(const RCF::Exception & e)
     {
@@ -109,33 +101,27 @@ string SnStore::get(int key) {
 }
 
 void SnStore::put(int key, string value) {
+    TxRequest_Request * req = current_request.add_reqs();
+    req->set_op(TxRequest_Request::PUT);
+    req->set_key1(key);
+    req->set_value(value);
     if (tx)
     {
-        std::ostringstream oss;
-        oss<<key;
-        tx_args += "put " + oss.str() + " ";
-        oss.clear();
-        oss<<value;
-        tx_args += oss.str()+ ";";
         return;
     }
     try
     {
-        PutRequest request;
-        request.set_key(key);
-        request.set_value(value);
-
-        PutResponse rsponse;
+        TxResponse rsponse;
         RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
         DbService::Stub stub(&channel);
 
         std::string strRequest;
-        TextFormat::PrintToString(request, &strRequest);
+        TextFormat::PrintToString(current_request, &strRequest);
         Debug("Sending request:" << std::endl);
         Debug(strRequest << std::endl);
 
         // Make a synchronous remote call to server.
-        stub.put(NULL,&request, &rsponse, NULL);
+        stub.execTx(NULL,&current_request, &rsponse, NULL);
 
         // Print out response.
         std::string strResponse;
@@ -149,44 +135,38 @@ void SnStore::put(int key, string value) {
         return ;
     }
 }
-vector<string> SnStore::getRange(int minKey, int maxKey) {
+vector<string> SnStore::getRange(int minkey, int maxkey) {
     vector<string> v;
+    TxRequest_Request * req = current_request.add_reqs();
+    req->set_op(TxRequest_Request::GETRANGE);
+    req->set_key1(minkey);
+    req->set_key2(maxkey);
     if (tx)
     {
-        std::ostringstream oss;
-        oss<<minKey;
-        tx_args += "getrange " + oss.str();
-        oss.clear();
-        oss<<maxKey;
-        tx_args += " "+ oss.str()+ ";";
         return v;
     }
     try
     {
-        GRRequest request;
-        request.set_start(minKey);
-        request.set_end(maxKey);
-
-        GRResponse rsponse;
+        TxResponse rsponse;
         RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
         DbService::Stub stub(&channel);
 
         std::string strRequest;
-        TextFormat::PrintToString(request, &strRequest);
+        TextFormat::PrintToString(current_request, &strRequest);
         Debug("Sending request:" << std::endl);
         Debug(strRequest << std::endl);
         // Make a synchronous remote call to server.
-        stub.getrange(NULL,&request, &rsponse, NULL);
+        stub.execTx(NULL,&current_request, &rsponse, NULL);
 
         // Print out response.
         std::string strResponse;
         TextFormat::PrintToString(rsponse, &strResponse);
         Debug("Received response:" << std::endl);
         Debug(strResponse << std::endl);
-        RepeatedPtrField< ::std::string> rst = rsponse.value();
-        RepeatedPtrField< ::std::string>::iterator it = rst.begin();
-        for(; it != rst.end(); it++)
-            v.push_back(*it);
+        RepeatedPtrField<TxResponse_Map> ret = rsponse.retvalue();
+        RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
+        for(; it != ret.end(); it++)
+            v.push_back(it->value());
         return v;
     }
     catch(const RCF::Exception & e)

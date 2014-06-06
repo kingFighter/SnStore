@@ -5,7 +5,6 @@
 #include <RCFProto.hpp>
 #include "../RCFProto/snstore.pb.h"
 #include <google/protobuf/text_format.h>
-#include <sstream>
 #include "../utility/debug.h"
 
 using namespace std;
@@ -15,12 +14,12 @@ namespace Kevin {
     SnStore();
     string get(int key);
     void put(int key, string value);
-    vector<string> getRange(int minKey, int maxKey);
+    vector<string> getRange(int minkey, int maxkey);
     void beginTx();
     void commit();
   private:
     bool tx;
-    string tx_args;
+    TxRequest current_request;
   };
 }
 #endif

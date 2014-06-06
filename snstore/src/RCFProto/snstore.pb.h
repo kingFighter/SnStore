@@ -23,6 +23,7 @@
 #include <google/protobuf/message.h>
 #include <google/protobuf/repeated_field.h>
 #include <google/protobuf/extension_set.h>
+#include <google/protobuf/generated_enum_reflection.h>
 #include <google/protobuf/service.h>
 #include <google/protobuf/unknown_field_set.h>
 // @@protoc_insertion_point(includes)
@@ -32,26 +33,41 @@ void  protobuf_AddDesc_snstore_2eproto();
 void protobuf_AssignDesc_snstore_2eproto();
 void protobuf_ShutdownFile_snstore_2eproto();
 
-class GetRequest;
-class GetResponse;
-class PutRequest;
-class PutResponse;
-class GRRequest;
-class GRResponse;
 class TxRequest;
+class TxRequest_Request;
 class TxResponse;
-class TxResponse_map;
+class TxResponse_Map;
 
+enum TxRequest_Request_OpCode {
+  TxRequest_Request_OpCode_GET = 0,
+  TxRequest_Request_OpCode_PUT = 1,
+  TxRequest_Request_OpCode_GETRANGE = 2
+};
+bool TxRequest_Request_OpCode_IsValid(int value);
+const TxRequest_Request_OpCode TxRequest_Request_OpCode_OpCode_MIN = TxRequest_Request_OpCode_GET;
+const TxRequest_Request_OpCode TxRequest_Request_OpCode_OpCode_MAX = TxRequest_Request_OpCode_GETRANGE;
+const int TxRequest_Request_OpCode_OpCode_ARRAYSIZE = TxRequest_Request_OpCode_OpCode_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* TxRequest_Request_OpCode_descriptor();
+inline const ::std::string& TxRequest_Request_OpCode_Name(TxRequest_Request_OpCode value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    TxRequest_Request_OpCode_descriptor(), value);
+}
+inline bool TxRequest_Request_OpCode_Parse(
+    const ::std::string& name, TxRequest_Request_OpCode* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<TxRequest_Request_OpCode>(
+    TxRequest_Request_OpCode_descriptor(), name, value);
+}
 // ===================================================================
 
-class GetRequest : public ::google::protobuf::Message {
+class TxRequest_Request : public ::google::protobuf::Message {
  public:
-  GetRequest();
-  virtual ~GetRequest();
+  TxRequest_Request();
+  virtual ~TxRequest_Request();
 
-  GetRequest(const GetRequest& from);
+  TxRequest_Request(const TxRequest_Request& from);
 
-  inline GetRequest& operator=(const GetRequest& from) {
+  inline TxRequest_Request& operator=(const TxRequest_Request& from) {
     CopyFrom(from);
     return *this;
   }
@@ -65,17 +81,17 @@ class GetRequest : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const GetRequest& default_instance();
+  static const TxRequest_Request& default_instance();
 
-  void Swap(GetRequest* other);
+  void Swap(TxRequest_Request* other);
 
   // implements Message ----------------------------------------------
 
-  GetRequest* New() const;
+  TxRequest_Request* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const GetRequest& from);
-  void MergeFrom(const GetRequest& from);
+  void CopyFrom(const TxRequest_Request& from);
+  void MergeFrom(const TxRequest_Request& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -96,94 +112,51 @@ class GetRequest : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
-  // accessors -------------------------------------------------------
-
-  // required int32 key = 1;
-  inline bool has_key() const;
-  inline void clear_key();
-  static const int kKeyFieldNumber = 1;
-  inline ::google::protobuf::int32 key() const;
-  inline void set_key(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:GetRequest)
- private:
-  inline void set_has_key();
-  inline void clear_has_key();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 key_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_snstore_2eproto();
-  friend void protobuf_AssignDesc_snstore_2eproto();
-  friend void protobuf_ShutdownFile_snstore_2eproto();
-
-  void InitAsDefaultInstance();
-  static GetRequest* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class GetResponse : public ::google::protobuf::Message {
- public:
-  GetResponse();
-  virtual ~GetResponse();
-
-  GetResponse(const GetResponse& from);
-
-  inline GetResponse& operator=(const GetResponse& from) {
-    CopyFrom(from);
-    return *this;
+  typedef TxRequest_Request_OpCode OpCode;
+  static const OpCode GET = TxRequest_Request_OpCode_GET;
+  static const OpCode PUT = TxRequest_Request_OpCode_PUT;
+  static const OpCode GETRANGE = TxRequest_Request_OpCode_GETRANGE;
+  static inline bool OpCode_IsValid(int value) {
+    return TxRequest_Request_OpCode_IsValid(value);
   }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
+  static const OpCode OpCode_MIN =
+    TxRequest_Request_OpCode_OpCode_MIN;
+  static const OpCode OpCode_MAX =
+    TxRequest_Request_OpCode_OpCode_MAX;
+  static const int OpCode_ARRAYSIZE =
+    TxRequest_Request_OpCode_OpCode_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  OpCode_descriptor() {
+    return TxRequest_Request_OpCode_descriptor();
   }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
+  static inline const ::std::string& OpCode_Name(OpCode value) {
+    return TxRequest_Request_OpCode_Name(value);
   }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const GetResponse& default_instance();
-
-  void Swap(GetResponse* other);
-
-  // implements Message ----------------------------------------------
-
-  GetResponse* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const GetResponse& from);
-  void MergeFrom(const GetResponse& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
+  static inline bool OpCode_Parse(const ::std::string& name,
+      OpCode* value) {
+    return TxRequest_Request_OpCode_Parse(name, value);
+  }
 
   // accessors -------------------------------------------------------
 
-  // required string value = 1;
+  // required .TxRequest.Request.OpCode op = 1;
+  inline bool has_op() const;
+  inline void clear_op();
+  static const int kOpFieldNumber = 1;
+  inline ::TxRequest_Request_OpCode op() const;
+  inline void set_op(::TxRequest_Request_OpCode value);
+
+  // optional int32 key1 = 2;
+  inline bool has_key1() const;
+  inline void clear_key1();
+  static const int kKey1FieldNumber = 2;
+  inline ::google::protobuf::int32 key1() const;
+  inline void set_key1(::google::protobuf::int32 value);
+
+  // optional string value = 3;
   inline bool has_value() const;
   inline void clear_value();
-  static const int kValueFieldNumber = 1;
+  static const int kValueFieldNumber = 3;
   inline const ::std::string& value() const;
   inline void set_value(const ::std::string& value);
   inline void set_value(const char* value);
@@ -192,394 +165,40 @@ class GetResponse : public ::google::protobuf::Message {
   inline ::std::string* release_value();
   inline void set_allocated_value(::std::string* value);
 
-  // @@protoc_insertion_point(class_scope:GetResponse)
+  // optional int32 key2 = 4;
+  inline bool has_key2() const;
+  inline void clear_key2();
+  static const int kKey2FieldNumber = 4;
+  inline ::google::protobuf::int32 key2() const;
+  inline void set_key2(::google::protobuf::int32 value);
+
+  // @@protoc_insertion_point(class_scope:TxRequest.Request)
  private:
+  inline void set_has_op();
+  inline void clear_has_op();
+  inline void set_has_key1();
+  inline void clear_has_key1();
   inline void set_has_value();
   inline void clear_has_value();
+  inline void set_has_key2();
+  inline void clear_has_key2();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
+  int op_;
+  ::google::protobuf::int32 key1_;
   ::std::string* value_;
+  ::google::protobuf::int32 key2_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
 
   friend void  protobuf_AddDesc_snstore_2eproto();
   friend void protobuf_AssignDesc_snstore_2eproto();
   friend void protobuf_ShutdownFile_snstore_2eproto();
 
   void InitAsDefaultInstance();
-  static GetResponse* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class PutRequest : public ::google::protobuf::Message {
- public:
-  PutRequest();
-  virtual ~PutRequest();
-
-  PutRequest(const PutRequest& from);
-
-  inline PutRequest& operator=(const PutRequest& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const PutRequest& default_instance();
-
-  void Swap(PutRequest* other);
-
-  // implements Message ----------------------------------------------
-
-  PutRequest* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const PutRequest& from);
-  void MergeFrom(const PutRequest& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 key = 1;
-  inline bool has_key() const;
-  inline void clear_key();
-  static const int kKeyFieldNumber = 1;
-  inline ::google::protobuf::int32 key() const;
-  inline void set_key(::google::protobuf::int32 value);
-
-  // required string value = 2;
-  inline bool has_value() const;
-  inline void clear_value();
-  static const int kValueFieldNumber = 2;
-  inline const ::std::string& value() const;
-  inline void set_value(const ::std::string& value);
-  inline void set_value(const char* value);
-  inline void set_value(const char* value, size_t size);
-  inline ::std::string* mutable_value();
-  inline ::std::string* release_value();
-  inline void set_allocated_value(::std::string* value);
-
-  // @@protoc_insertion_point(class_scope:PutRequest)
- private:
-  inline void set_has_key();
-  inline void clear_has_key();
-  inline void set_has_value();
-  inline void clear_has_value();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::std::string* value_;
-  ::google::protobuf::int32 key_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-
-  friend void  protobuf_AddDesc_snstore_2eproto();
-  friend void protobuf_AssignDesc_snstore_2eproto();
-  friend void protobuf_ShutdownFile_snstore_2eproto();
-
-  void InitAsDefaultInstance();
-  static PutRequest* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class PutResponse : public ::google::protobuf::Message {
- public:
-  PutResponse();
-  virtual ~PutResponse();
-
-  PutResponse(const PutResponse& from);
-
-  inline PutResponse& operator=(const PutResponse& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const PutResponse& default_instance();
-
-  void Swap(PutResponse* other);
-
-  // implements Message ----------------------------------------------
-
-  PutResponse* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const PutResponse& from);
-  void MergeFrom(const PutResponse& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required bool result = 1;
-  inline bool has_result() const;
-  inline void clear_result();
-  static const int kResultFieldNumber = 1;
-  inline bool result() const;
-  inline void set_result(bool value);
-
-  // @@protoc_insertion_point(class_scope:PutResponse)
- private:
-  inline void set_has_result();
-  inline void clear_has_result();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  bool result_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
-
-  friend void  protobuf_AddDesc_snstore_2eproto();
-  friend void protobuf_AssignDesc_snstore_2eproto();
-  friend void protobuf_ShutdownFile_snstore_2eproto();
-
-  void InitAsDefaultInstance();
-  static PutResponse* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class GRRequest : public ::google::protobuf::Message {
- public:
-  GRRequest();
-  virtual ~GRRequest();
-
-  GRRequest(const GRRequest& from);
-
-  inline GRRequest& operator=(const GRRequest& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const GRRequest& default_instance();
-
-  void Swap(GRRequest* other);
-
-  // implements Message ----------------------------------------------
-
-  GRRequest* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const GRRequest& from);
-  void MergeFrom(const GRRequest& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required int32 start = 1;
-  inline bool has_start() const;
-  inline void clear_start();
-  static const int kStartFieldNumber = 1;
-  inline ::google::protobuf::int32 start() const;
-  inline void set_start(::google::protobuf::int32 value);
-
-  // required int32 end = 2;
-  inline bool has_end() const;
-  inline void clear_end();
-  static const int kEndFieldNumber = 2;
-  inline ::google::protobuf::int32 end() const;
-  inline void set_end(::google::protobuf::int32 value);
-
-  // @@protoc_insertion_point(class_scope:GRRequest)
- private:
-  inline void set_has_start();
-  inline void clear_has_start();
-  inline void set_has_end();
-  inline void clear_has_end();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::int32 start_;
-  ::google::protobuf::int32 end_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-
-  friend void  protobuf_AddDesc_snstore_2eproto();
-  friend void protobuf_AssignDesc_snstore_2eproto();
-  friend void protobuf_ShutdownFile_snstore_2eproto();
-
-  void InitAsDefaultInstance();
-  static GRRequest* default_instance_;
-};
-// -------------------------------------------------------------------
-
-class GRResponse : public ::google::protobuf::Message {
- public:
-  GRResponse();
-  virtual ~GRResponse();
-
-  GRResponse(const GRResponse& from);
-
-  inline GRResponse& operator=(const GRResponse& from) {
-    CopyFrom(from);
-    return *this;
-  }
-
-  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
-    return _unknown_fields_;
-  }
-
-  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
-    return &_unknown_fields_;
-  }
-
-  static const ::google::protobuf::Descriptor* descriptor();
-  static const GRResponse& default_instance();
-
-  void Swap(GRResponse* other);
-
-  // implements Message ----------------------------------------------
-
-  GRResponse* New() const;
-  void CopyFrom(const ::google::protobuf::Message& from);
-  void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const GRResponse& from);
-  void MergeFrom(const GRResponse& from);
-  void Clear();
-  bool IsInitialized() const;
-
-  int ByteSize() const;
-  bool MergePartialFromCodedStream(
-      ::google::protobuf::io::CodedInputStream* input);
-  void SerializeWithCachedSizes(
-      ::google::protobuf::io::CodedOutputStream* output) const;
-  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
-  int GetCachedSize() const { return _cached_size_; }
-  private:
-  void SharedCtor();
-  void SharedDtor();
-  void SetCachedSize(int size) const;
-  public:
-
-  ::google::protobuf::Metadata GetMetadata() const;
-
-  // nested types ----------------------------------------------------
-
-  // accessors -------------------------------------------------------
-
-  // required bool result = 1;
-  inline bool has_result() const;
-  inline void clear_result();
-  static const int kResultFieldNumber = 1;
-  inline bool result() const;
-  inline void set_result(bool value);
-
-  // repeated string value = 2;
-  inline int value_size() const;
-  inline void clear_value();
-  static const int kValueFieldNumber = 2;
-  inline const ::std::string& value(int index) const;
-  inline ::std::string* mutable_value(int index);
-  inline void set_value(int index, const ::std::string& value);
-  inline void set_value(int index, const char* value);
-  inline void set_value(int index, const char* value, size_t size);
-  inline ::std::string* add_value();
-  inline void add_value(const ::std::string& value);
-  inline void add_value(const char* value);
-  inline void add_value(const char* value, size_t size);
-  inline const ::google::protobuf::RepeatedPtrField< ::std::string>& value() const;
-  inline ::google::protobuf::RepeatedPtrField< ::std::string>* mutable_value();
-
-  // @@protoc_insertion_point(class_scope:GRResponse)
- private:
-  inline void set_has_result();
-  inline void clear_has_result();
-
-  ::google::protobuf::UnknownFieldSet _unknown_fields_;
-
-  ::google::protobuf::RepeatedPtrField< ::std::string> value_;
-  bool result_;
-
-  mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
-
-  friend void  protobuf_AddDesc_snstore_2eproto();
-  friend void protobuf_AssignDesc_snstore_2eproto();
-  friend void protobuf_ShutdownFile_snstore_2eproto();
-
-  void InitAsDefaultInstance();
-  static GRResponse* default_instance_;
+  static TxRequest_Request* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -635,28 +254,28 @@ class TxRequest : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
+  typedef TxRequest_Request Request;
+
   // accessors -------------------------------------------------------
 
-  // required string args = 1;
-  inline bool has_args() const;
-  inline void clear_args();
-  static const int kArgsFieldNumber = 1;
-  inline const ::std::string& args() const;
-  inline void set_args(const ::std::string& value);
-  inline void set_args(const char* value);
-  inline void set_args(const char* value, size_t size);
-  inline ::std::string* mutable_args();
-  inline ::std::string* release_args();
-  inline void set_allocated_args(::std::string* args);
+  // repeated .TxRequest.Request reqs = 1;
+  inline int reqs_size() const;
+  inline void clear_reqs();
+  static const int kReqsFieldNumber = 1;
+  inline const ::TxRequest_Request& reqs(int index) const;
+  inline ::TxRequest_Request* mutable_reqs(int index);
+  inline ::TxRequest_Request* add_reqs();
+  inline const ::google::protobuf::RepeatedPtrField< ::TxRequest_Request >&
+      reqs() const;
+  inline ::google::protobuf::RepeatedPtrField< ::TxRequest_Request >*
+      mutable_reqs();
 
   // @@protoc_insertion_point(class_scope:TxRequest)
  private:
-  inline void set_has_args();
-  inline void clear_has_args();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::std::string* args_;
+  ::google::protobuf::RepeatedPtrField< ::TxRequest_Request > reqs_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -670,14 +289,14 @@ class TxRequest : public ::google::protobuf::Message {
 };
 // -------------------------------------------------------------------
 
-class TxResponse_map : public ::google::protobuf::Message {
+class TxResponse_Map : public ::google::protobuf::Message {
  public:
-  TxResponse_map();
-  virtual ~TxResponse_map();
+  TxResponse_Map();
+  virtual ~TxResponse_Map();
 
-  TxResponse_map(const TxResponse_map& from);
+  TxResponse_Map(const TxResponse_Map& from);
 
-  inline TxResponse_map& operator=(const TxResponse_map& from) {
+  inline TxResponse_Map& operator=(const TxResponse_Map& from) {
     CopyFrom(from);
     return *this;
   }
@@ -691,17 +310,17 @@ class TxResponse_map : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const TxResponse_map& default_instance();
+  static const TxResponse_Map& default_instance();
 
-  void Swap(TxResponse_map* other);
+  void Swap(TxResponse_Map* other);
 
   // implements Message ----------------------------------------------
 
-  TxResponse_map* New() const;
+  TxResponse_Map* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const TxResponse_map& from);
-  void MergeFrom(const TxResponse_map& from);
+  void CopyFrom(const TxResponse_Map& from);
+  void MergeFrom(const TxResponse_Map& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -743,7 +362,7 @@ class TxResponse_map : public ::google::protobuf::Message {
   inline ::std::string* release_value();
   inline void set_allocated_value(::std::string* value);
 
-  // @@protoc_insertion_point(class_scope:TxResponse.map)
+  // @@protoc_insertion_point(class_scope:TxResponse.Map)
  private:
   inline void set_has_key();
   inline void clear_has_key();
@@ -763,7 +382,7 @@ class TxResponse_map : public ::google::protobuf::Message {
   friend void protobuf_ShutdownFile_snstore_2eproto();
 
   void InitAsDefaultInstance();
-  static TxResponse_map* default_instance_;
+  static TxResponse_Map* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -819,20 +438,20 @@ class TxResponse : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
-  typedef TxResponse_map map;
+  typedef TxResponse_Map Map;
 
   // accessors -------------------------------------------------------
 
-  // repeated .TxResponse.map retValue = 1;
+  // repeated .TxResponse.Map retvalue = 1;
   inline int retvalue_size() const;
   inline void clear_retvalue();
-  static const int kRetValueFieldNumber = 1;
-  inline const ::TxResponse_map& retvalue(int index) const;
-  inline ::TxResponse_map* mutable_retvalue(int index);
-  inline ::TxResponse_map* add_retvalue();
-  inline const ::google::protobuf::RepeatedPtrField< ::TxResponse_map >&
+  static const int kRetvalueFieldNumber = 1;
+  inline const ::TxResponse_Map& retvalue(int index) const;
+  inline ::TxResponse_Map* mutable_retvalue(int index);
+  inline ::TxResponse_Map* add_retvalue();
+  inline const ::google::protobuf::RepeatedPtrField< ::TxResponse_Map >&
       retvalue() const;
-  inline ::google::protobuf::RepeatedPtrField< ::TxResponse_map >*
+  inline ::google::protobuf::RepeatedPtrField< ::TxResponse_Map >*
       mutable_retvalue();
 
   // @@protoc_insertion_point(class_scope:TxResponse)
@@ -840,7 +459,7 @@ class TxResponse : public ::google::protobuf::Message {
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
-  ::google::protobuf::RepeatedPtrField< ::TxResponse_map > retvalue_;
+  ::google::protobuf::RepeatedPtrField< ::TxResponse_Map > retvalue_;
 
   mutable int _cached_size_;
   ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
@@ -867,18 +486,6 @@ class DbService : public ::google::protobuf::Service {
 
   static const ::google::protobuf::ServiceDescriptor* descriptor();
 
-  virtual void get(::google::protobuf::RpcController* controller,
-                       const ::GetRequest* request,
-                       ::GetResponse* response,
-                       ::google::protobuf::Closure* done);
-  virtual void put(::google::protobuf::RpcController* controller,
-                       const ::PutRequest* request,
-                       ::PutResponse* response,
-                       ::google::protobuf::Closure* done);
-  virtual void getrange(::google::protobuf::RpcController* controller,
-                       const ::GRRequest* request,
-                       ::GRResponse* response,
-                       ::google::protobuf::Closure* done);
   virtual void execTx(::google::protobuf::RpcController* controller,
                        const ::TxRequest* request,
                        ::TxResponse* response,
@@ -912,18 +519,6 @@ class DbService_Stub : public DbService {
 
   // implements DbService ------------------------------------------
 
-  void get(::google::protobuf::RpcController* controller,
-                       const ::GetRequest* request,
-                       ::GetResponse* response,
-                       ::google::protobuf::Closure* done);
-  void put(::google::protobuf::RpcController* controller,
-                       const ::PutRequest* request,
-                       ::PutResponse* response,
-                       ::google::protobuf::Closure* done);
-  void getrange(::google::protobuf::RpcController* controller,
-                       const ::GRRequest* request,
-                       ::GRResponse* response,
-                       ::google::protobuf::Closure* done);
   void execTx(::google::protobuf::RpcController* controller,
                        const ::TxRequest* request,
                        ::TxResponse* response,
@@ -940,82 +535,101 @@ class DbService_Stub : public DbService {
 
 // ===================================================================
 
-// GetRequest
+// TxRequest_Request
 
-// required int32 key = 1;
-inline bool GetRequest::has_key() const {
+// required .TxRequest.Request.OpCode op = 1;
+inline bool TxRequest_Request::has_op() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void GetRequest::set_has_key() {
+inline void TxRequest_Request::set_has_op() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void GetRequest::clear_has_key() {
+inline void TxRequest_Request::clear_has_op() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void GetRequest::clear_key() {
-  key_ = 0;
-  clear_has_key();
+inline void TxRequest_Request::clear_op() {
+  op_ = 0;
+  clear_has_op();
 }
-inline ::google::protobuf::int32 GetRequest::key() const {
-  return key_;
+inline ::TxRequest_Request_OpCode TxRequest_Request::op() const {
+  return static_cast< ::TxRequest_Request_OpCode >(op_);
 }
-inline void GetRequest::set_key(::google::protobuf::int32 value) {
-  set_has_key();
-  key_ = value;
+inline void TxRequest_Request::set_op(::TxRequest_Request_OpCode value) {
+  assert(::TxRequest_Request_OpCode_IsValid(value));
+  set_has_op();
+  op_ = value;
 }
 
-// -------------------------------------------------------------------
+// optional int32 key1 = 2;
+inline bool TxRequest_Request::has_key1() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void TxRequest_Request::set_has_key1() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void TxRequest_Request::clear_has_key1() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void TxRequest_Request::clear_key1() {
+  key1_ = 0;
+  clear_has_key1();
+}
+inline ::google::protobuf::int32 TxRequest_Request::key1() const {
+  return key1_;
+}
+inline void TxRequest_Request::set_key1(::google::protobuf::int32 value) {
+  set_has_key1();
+  key1_ = value;
+}
 
-// GetResponse
-
-// required string value = 1;
-inline bool GetResponse::has_value() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+// optional string value = 3;
+inline bool TxRequest_Request::has_value() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void GetResponse::set_has_value() {
-  _has_bits_[0] |= 0x00000001u;
+inline void TxRequest_Request::set_has_value() {
+  _has_bits_[0] |= 0x00000004u;
 }
-inline void GetResponse::clear_has_value() {
-  _has_bits_[0] &= ~0x00000001u;
+inline void TxRequest_Request::clear_has_value() {
+  _has_bits_[0] &= ~0x00000004u;
 }
-inline void GetResponse::clear_value() {
+inline void TxRequest_Request::clear_value() {
   if (value_ != &::google::protobuf::internal::kEmptyString) {
     value_->clear();
   }
   clear_has_value();
 }
-inline const ::std::string& GetResponse::value() const {
+inline const ::std::string& TxRequest_Request::value() const {
   return *value_;
 }
-inline void GetResponse::set_value(const ::std::string& value) {
+inline void TxRequest_Request::set_value(const ::std::string& value) {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   value_->assign(value);
 }
-inline void GetResponse::set_value(const char* value) {
+inline void TxRequest_Request::set_value(const char* value) {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   value_->assign(value);
 }
-inline void GetResponse::set_value(const char* value, size_t size) {
+inline void TxRequest_Request::set_value(const char* value, size_t size) {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   value_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* GetResponse::mutable_value() {
+inline ::std::string* TxRequest_Request::mutable_value() {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   return value_;
 }
-inline ::std::string* GetResponse::release_value() {
+inline ::std::string* TxRequest_Request::release_value() {
   clear_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -1025,7 +639,7 @@ inline ::std::string* GetResponse::release_value() {
     return temp;
   }
 }
-inline void GetResponse::set_allocated_value(::std::string* value) {
+inline void TxRequest_Request::set_allocated_value(::std::string* value) {
   if (value_ != &::google::protobuf::internal::kEmptyString) {
     delete value_;
   }
@@ -1038,394 +652,131 @@ inline void GetResponse::set_allocated_value(::std::string* value) {
   }
 }
 
-// -------------------------------------------------------------------
-
-// PutRequest
-
-// required int32 key = 1;
-inline bool PutRequest::has_key() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+// optional int32 key2 = 4;
+inline bool TxRequest_Request::has_key2() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
-inline void PutRequest::set_has_key() {
-  _has_bits_[0] |= 0x00000001u;
+inline void TxRequest_Request::set_has_key2() {
+  _has_bits_[0] |= 0x00000008u;
 }
-inline void PutRequest::clear_has_key() {
-  _has_bits_[0] &= ~0x00000001u;
+inline void TxRequest_Request::clear_has_key2() {
+  _has_bits_[0] &= ~0x00000008u;
 }
-inline void PutRequest::clear_key() {
-  key_ = 0;
-  clear_has_key();
+inline void TxRequest_Request::clear_key2() {
+  key2_ = 0;
+  clear_has_key2();
 }
-inline ::google::protobuf::int32 PutRequest::key() const {
-  return key_;
+inline ::google::protobuf::int32 TxRequest_Request::key2() const {
+  return key2_;
 }
-inline void PutRequest::set_key(::google::protobuf::int32 value) {
-  set_has_key();
-  key_ = value;
-}
-
-// required string value = 2;
-inline bool PutRequest::has_value() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void PutRequest::set_has_value() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void PutRequest::clear_has_value() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void PutRequest::clear_value() {
-  if (value_ != &::google::protobuf::internal::kEmptyString) {
-    value_->clear();
-  }
-  clear_has_value();
-}
-inline const ::std::string& PutRequest::value() const {
-  return *value_;
-}
-inline void PutRequest::set_value(const ::std::string& value) {
-  set_has_value();
-  if (value_ == &::google::protobuf::internal::kEmptyString) {
-    value_ = new ::std::string;
-  }
-  value_->assign(value);
-}
-inline void PutRequest::set_value(const char* value) {
-  set_has_value();
-  if (value_ == &::google::protobuf::internal::kEmptyString) {
-    value_ = new ::std::string;
-  }
-  value_->assign(value);
-}
-inline void PutRequest::set_value(const char* value, size_t size) {
-  set_has_value();
-  if (value_ == &::google::protobuf::internal::kEmptyString) {
-    value_ = new ::std::string;
-  }
-  value_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* PutRequest::mutable_value() {
-  set_has_value();
-  if (value_ == &::google::protobuf::internal::kEmptyString) {
-    value_ = new ::std::string;
-  }
-  return value_;
-}
-inline ::std::string* PutRequest::release_value() {
-  clear_has_value();
-  if (value_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = value_;
-    value_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void PutRequest::set_allocated_value(::std::string* value) {
-  if (value_ != &::google::protobuf::internal::kEmptyString) {
-    delete value_;
-  }
-  if (value) {
-    set_has_value();
-    value_ = value;
-  } else {
-    clear_has_value();
-    value_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
-}
-
-// -------------------------------------------------------------------
-
-// PutResponse
-
-// required bool result = 1;
-inline bool PutResponse::has_result() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void PutResponse::set_has_result() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void PutResponse::clear_has_result() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void PutResponse::clear_result() {
-  result_ = false;
-  clear_has_result();
-}
-inline bool PutResponse::result() const {
-  return result_;
-}
-inline void PutResponse::set_result(bool value) {
-  set_has_result();
-  result_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// GRRequest
-
-// required int32 start = 1;
-inline bool GRRequest::has_start() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void GRRequest::set_has_start() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void GRRequest::clear_has_start() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void GRRequest::clear_start() {
-  start_ = 0;
-  clear_has_start();
-}
-inline ::google::protobuf::int32 GRRequest::start() const {
-  return start_;
-}
-inline void GRRequest::set_start(::google::protobuf::int32 value) {
-  set_has_start();
-  start_ = value;
-}
-
-// required int32 end = 2;
-inline bool GRRequest::has_end() const {
-  return (_has_bits_[0] & 0x00000002u) != 0;
-}
-inline void GRRequest::set_has_end() {
-  _has_bits_[0] |= 0x00000002u;
-}
-inline void GRRequest::clear_has_end() {
-  _has_bits_[0] &= ~0x00000002u;
-}
-inline void GRRequest::clear_end() {
-  end_ = 0;
-  clear_has_end();
-}
-inline ::google::protobuf::int32 GRRequest::end() const {
-  return end_;
-}
-inline void GRRequest::set_end(::google::protobuf::int32 value) {
-  set_has_end();
-  end_ = value;
-}
-
-// -------------------------------------------------------------------
-
-// GRResponse
-
-// required bool result = 1;
-inline bool GRResponse::has_result() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
-}
-inline void GRResponse::set_has_result() {
-  _has_bits_[0] |= 0x00000001u;
-}
-inline void GRResponse::clear_has_result() {
-  _has_bits_[0] &= ~0x00000001u;
-}
-inline void GRResponse::clear_result() {
-  result_ = false;
-  clear_has_result();
-}
-inline bool GRResponse::result() const {
-  return result_;
-}
-inline void GRResponse::set_result(bool value) {
-  set_has_result();
-  result_ = value;
-}
-
-// repeated string value = 2;
-inline int GRResponse::value_size() const {
-  return value_.size();
-}
-inline void GRResponse::clear_value() {
-  value_.Clear();
-}
-inline const ::std::string& GRResponse::value(int index) const {
-  return value_.Get(index);
-}
-inline ::std::string* GRResponse::mutable_value(int index) {
-  return value_.Mutable(index);
-}
-inline void GRResponse::set_value(int index, const ::std::string& value) {
-  value_.Mutable(index)->assign(value);
-}
-inline void GRResponse::set_value(int index, const char* value) {
-  value_.Mutable(index)->assign(value);
-}
-inline void GRResponse::set_value(int index, const char* value, size_t size) {
-  value_.Mutable(index)->assign(
-    reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* GRResponse::add_value() {
-  return value_.Add();
-}
-inline void GRResponse::add_value(const ::std::string& value) {
-  value_.Add()->assign(value);
-}
-inline void GRResponse::add_value(const char* value) {
-  value_.Add()->assign(value);
-}
-inline void GRResponse::add_value(const char* value, size_t size) {
-  value_.Add()->assign(reinterpret_cast<const char*>(value), size);
-}
-inline const ::google::protobuf::RepeatedPtrField< ::std::string>&
-GRResponse::value() const {
-  return value_;
-}
-inline ::google::protobuf::RepeatedPtrField< ::std::string>*
-GRResponse::mutable_value() {
-  return &value_;
+inline void TxRequest_Request::set_key2(::google::protobuf::int32 value) {
+  set_has_key2();
+  key2_ = value;
 }
 
 // -------------------------------------------------------------------
 
 // TxRequest
 
-// required string args = 1;
-inline bool TxRequest::has_args() const {
-  return (_has_bits_[0] & 0x00000001u) != 0;
+// repeated .TxRequest.Request reqs = 1;
+inline int TxRequest::reqs_size() const {
+  return reqs_.size();
 }
-inline void TxRequest::set_has_args() {
-  _has_bits_[0] |= 0x00000001u;
+inline void TxRequest::clear_reqs() {
+  reqs_.Clear();
 }
-inline void TxRequest::clear_has_args() {
-  _has_bits_[0] &= ~0x00000001u;
+inline const ::TxRequest_Request& TxRequest::reqs(int index) const {
+  return reqs_.Get(index);
 }
-inline void TxRequest::clear_args() {
-  if (args_ != &::google::protobuf::internal::kEmptyString) {
-    args_->clear();
-  }
-  clear_has_args();
+inline ::TxRequest_Request* TxRequest::mutable_reqs(int index) {
+  return reqs_.Mutable(index);
 }
-inline const ::std::string& TxRequest::args() const {
-  return *args_;
+inline ::TxRequest_Request* TxRequest::add_reqs() {
+  return reqs_.Add();
 }
-inline void TxRequest::set_args(const ::std::string& value) {
-  set_has_args();
-  if (args_ == &::google::protobuf::internal::kEmptyString) {
-    args_ = new ::std::string;
-  }
-  args_->assign(value);
+inline const ::google::protobuf::RepeatedPtrField< ::TxRequest_Request >&
+TxRequest::reqs() const {
+  return reqs_;
 }
-inline void TxRequest::set_args(const char* value) {
-  set_has_args();
-  if (args_ == &::google::protobuf::internal::kEmptyString) {
-    args_ = new ::std::string;
-  }
-  args_->assign(value);
-}
-inline void TxRequest::set_args(const char* value, size_t size) {
-  set_has_args();
-  if (args_ == &::google::protobuf::internal::kEmptyString) {
-    args_ = new ::std::string;
-  }
-  args_->assign(reinterpret_cast<const char*>(value), size);
-}
-inline ::std::string* TxRequest::mutable_args() {
-  set_has_args();
-  if (args_ == &::google::protobuf::internal::kEmptyString) {
-    args_ = new ::std::string;
-  }
-  return args_;
-}
-inline ::std::string* TxRequest::release_args() {
-  clear_has_args();
-  if (args_ == &::google::protobuf::internal::kEmptyString) {
-    return NULL;
-  } else {
-    ::std::string* temp = args_;
-    args_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-    return temp;
-  }
-}
-inline void TxRequest::set_allocated_args(::std::string* args) {
-  if (args_ != &::google::protobuf::internal::kEmptyString) {
-    delete args_;
-  }
-  if (args) {
-    set_has_args();
-    args_ = args;
-  } else {
-    clear_has_args();
-    args_ = const_cast< ::std::string*>(&::google::protobuf::internal::kEmptyString);
-  }
+inline ::google::protobuf::RepeatedPtrField< ::TxRequest_Request >*
+TxRequest::mutable_reqs() {
+  return &reqs_;
 }
 
 // -------------------------------------------------------------------
 
-// TxResponse_map
+// TxResponse_Map
 
 // required int32 key = 1;
-inline bool TxResponse_map::has_key() const {
+inline bool TxResponse_Map::has_key() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void TxResponse_map::set_has_key() {
+inline void TxResponse_Map::set_has_key() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void TxResponse_map::clear_has_key() {
+inline void TxResponse_Map::clear_has_key() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void TxResponse_map::clear_key() {
+inline void TxResponse_Map::clear_key() {
   key_ = 0;
   clear_has_key();
 }
-inline ::google::protobuf::int32 TxResponse_map::key() const {
+inline ::google::protobuf::int32 TxResponse_Map::key() const {
   return key_;
 }
-inline void TxResponse_map::set_key(::google::protobuf::int32 value) {
+inline void TxResponse_Map::set_key(::google::protobuf::int32 value) {
   set_has_key();
   key_ = value;
 }
 
 // required string value = 2;
-inline bool TxResponse_map::has_value() const {
+inline bool TxResponse_Map::has_value() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void TxResponse_map::set_has_value() {
+inline void TxResponse_Map::set_has_value() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void TxResponse_map::clear_has_value() {
+inline void TxResponse_Map::clear_has_value() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void TxResponse_map::clear_value() {
+inline void TxResponse_Map::clear_value() {
   if (value_ != &::google::protobuf::internal::kEmptyString) {
     value_->clear();
   }
   clear_has_value();
 }
-inline const ::std::string& TxResponse_map::value() const {
+inline const ::std::string& TxResponse_Map::value() const {
   return *value_;
 }
-inline void TxResponse_map::set_value(const ::std::string& value) {
+inline void TxResponse_Map::set_value(const ::std::string& value) {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   value_->assign(value);
 }
-inline void TxResponse_map::set_value(const char* value) {
+inline void TxResponse_Map::set_value(const char* value) {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   value_->assign(value);
 }
-inline void TxResponse_map::set_value(const char* value, size_t size) {
+inline void TxResponse_Map::set_value(const char* value, size_t size) {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   value_->assign(reinterpret_cast<const char*>(value), size);
 }
-inline ::std::string* TxResponse_map::mutable_value() {
+inline ::std::string* TxResponse_Map::mutable_value() {
   set_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     value_ = new ::std::string;
   }
   return value_;
 }
-inline ::std::string* TxResponse_map::release_value() {
+inline ::std::string* TxResponse_Map::release_value() {
   clear_has_value();
   if (value_ == &::google::protobuf::internal::kEmptyString) {
     return NULL;
@@ -1435,7 +786,7 @@ inline ::std::string* TxResponse_map::release_value() {
     return temp;
   }
 }
-inline void TxResponse_map::set_allocated_value(::std::string* value) {
+inline void TxResponse_Map::set_allocated_value(::std::string* value) {
   if (value_ != &::google::protobuf::internal::kEmptyString) {
     delete value_;
   }
@@ -1452,27 +803,27 @@ inline void TxResponse_map::set_allocated_value(::std::string* value) {
 
 // TxResponse
 
-// repeated .TxResponse.map retValue = 1;
+// repeated .TxResponse.Map retvalue = 1;
 inline int TxResponse::retvalue_size() const {
   return retvalue_.size();
 }
 inline void TxResponse::clear_retvalue() {
   retvalue_.Clear();
 }
-inline const ::TxResponse_map& TxResponse::retvalue(int index) const {
+inline const ::TxResponse_Map& TxResponse::retvalue(int index) const {
   return retvalue_.Get(index);
 }
-inline ::TxResponse_map* TxResponse::mutable_retvalue(int index) {
+inline ::TxResponse_Map* TxResponse::mutable_retvalue(int index) {
   return retvalue_.Mutable(index);
 }
-inline ::TxResponse_map* TxResponse::add_retvalue() {
+inline ::TxResponse_Map* TxResponse::add_retvalue() {
   return retvalue_.Add();
 }
-inline const ::google::protobuf::RepeatedPtrField< ::TxResponse_map >&
+inline const ::google::protobuf::RepeatedPtrField< ::TxResponse_Map >&
 TxResponse::retvalue() const {
   return retvalue_;
 }
-inline ::google::protobuf::RepeatedPtrField< ::TxResponse_map >*
+inline ::google::protobuf::RepeatedPtrField< ::TxResponse_Map >*
 TxResponse::mutable_retvalue() {
   return &retvalue_;
 }
@@ -1484,6 +835,10 @@ TxResponse::mutable_retvalue() {
 namespace google {
 namespace protobuf {
 
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::TxRequest_Request_OpCode>() {
+  return ::TxRequest_Request_OpCode_descriptor();
+}
 
 }  // namespace google
 }  // namespace protobuf
