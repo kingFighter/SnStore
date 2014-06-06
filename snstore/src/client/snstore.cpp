@@ -53,10 +53,12 @@ void SnStore::commit()
         RepeatedPtrField<TxResponse_Map>::iterator it = rst.begin();
         for(; it != rst.end(); it++)
           Debug(it->key()<<","<<it->value()<<std::endl);
+        current_request.clear_reqs();
     }
     catch(const RCF::Exception & e)
     {
-      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        current_request.clear_reqs();
         return ;
     }
 
@@ -91,11 +93,13 @@ string SnStore::get(int key) {
         Debug(strResponse << std::endl);
         RepeatedPtrField<TxResponse_Map> ret = response.retvalue();
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
+        current_request.clear_reqs();
         return it->value();
     }
     catch(const RCF::Exception & e)
     {
-      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        current_request.clear_reqs();
         return "";
     }
 }
@@ -128,10 +132,12 @@ void SnStore::put(int key, string value) {
         TextFormat::PrintToString(rsponse, &strResponse);
         Debug("Received response:" << std::endl);
         Debug(strResponse << std::endl);
+        current_request.clear_reqs();
     }
     catch(const RCF::Exception & e)
     {
-      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        current_request.clear_reqs();
         return ;
     }
 }
@@ -167,11 +173,13 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
         for(; it != ret.end(); it++)
             v.push_back(it->value());
+        current_request.clear_reqs();
         return v;
     }
     catch(const RCF::Exception & e)
     {
-      Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        current_request.clear_reqs();
         return v;
     }
     return v;
