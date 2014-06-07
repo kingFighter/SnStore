@@ -101,7 +101,8 @@ string SnStore::get(int key) {
     }
     try
     {
-        TxRequest_Request * req = current_request.add_reqs();
+        TxRequest request;
+        TxRequest_Request * req = request.add_reqs();
         req->set_op(TxRequest_Request::GET);
         req->set_key1(key);
 
@@ -110,12 +111,12 @@ string SnStore::get(int key) {
         DbService::Stub stub(&channel);
 
         std::string strRequest;
-        TextFormat::PrintToString(current_request, &strRequest);
+        TextFormat::PrintToString(request, &strRequest);
         Debug("Sending request:" << std::endl);
         Debug(strRequest << std::endl);
 
         // Make a synchronous remote call to server.
-        stub.execTx(NULL,&current_request, &response, NULL);
+        stub.execTx(NULL,&request, &response, NULL);
 
         // Print out response.
         std::string strResponse;
@@ -126,17 +127,14 @@ string SnStore::get(int key) {
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
 
         if (current_request.txid() != DEFAULT_TX_ID) { //this is a transaction request
-            cache[key] = it->value();
-        }
-        else {
-            current_request.clear_reqs();
+            if (it->value() != "")//the value exists
+                cache[key] = it->value();
         }
         return it->value();
     }
     catch(const RCF::Exception & e)
     {
         Debug("RCF::Exception: " << e.getErrorString() << std::endl);
-        current_request.clear_reqs();
         return "";
     }
 }
@@ -198,7 +196,8 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
 
     try
     {
-        TxRequest_Request * req = current_request.add_reqs();
+        TxRequest request;
+        TxRequest_Request * req = request.add_reqs();
         req->set_op(TxRequest_Request::GETRANGE);
         req->set_key1(minkey);
         req->set_key2(maxkey);
@@ -208,11 +207,11 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
         DbService::Stub stub(&channel);
 
         std::string strRequest;
-        TextFormat::PrintToString(current_request, &strRequest);
+        TextFormat::PrintToString(request, &strRequest);
         Debug("Sending request:" << std::endl);
         Debug(strRequest << std::endl);
         // Make a synchronous remote call to server.
-        stub.execTx(NULL,&current_request, &rsponse, NULL);
+        stub.execTx(NULL,&request, &rsponse, NULL);
 
         // Print out response.
         std::string strResponse;
@@ -222,18 +221,24 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
         RepeatedPtrField<TxResponse_Map> ret = rsponse.retvalue();
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
         for(; it != ret.end(); it++) {
-            v.push_back(it->value());
-            if(current_request.txid() != DEFAULT_TX_ID)
-                cache[it->key()] = it->value();
+            if (current_request.txid() != DEFAULT_TX_ID) {//transaction
+                if (it->value() != "") {//\ and not ""
+                    cache[it->key()] = it->value();
+                }
+                if (cache.count(it->key()) != 0)
+                    v.push_back(cache[it->key()]);
+                else
+                    v.push_back("");
+            }
+            else
+                v.push_back(it->value());
+
         }
-        if (current_request.txid() == DEFAULT_TX_ID)
-            current_request.clear_reqs();
         return v;
     }
     catch(const RCF::Exception & e)
     {
         Debug("RCF::Exception: " << e.getErrorString() << std::endl);
-        current_request.clear_reqs();
         return v;
     }
     return v;

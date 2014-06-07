@@ -108,7 +108,7 @@ void testCorrectness() {
   cout << string(SENUM, '*') << endl;
   cout << "Test Correctness.\n";
   cout << string(SENUM, '-') << endl;
-  
+
   // Test put&get
   cout << "Test put&get functions: \n";
   bool passed = true;
@@ -178,7 +178,7 @@ void testCorrectness() {
     passGreen("Test get before put passed.\n");
   }
 
-  // test getRange in commit 
+  // test getRange in commit
   if (db.getRange(testKeyMin, testKeyMax) != rangeValue) {
     failRed("Test getRange in commit failed\n");
     passed = false;
@@ -233,7 +233,7 @@ void testCorrectness() {
   cout << "Test transaction commit abort.\n";
   // transaction commit abort test
 
-  
+
   cout << string(SENUM, '+') << endl;
   if (passed) {
     passGreen("Test transaction commit abort passed.\n");
@@ -243,8 +243,8 @@ void testCorrectness() {
     twoPassed = false;
   }
   cout << string(SENUM, '+') << endl << endl;
-  
-  
+
+
   if (twoPassed) {
     passGreen("Test transaction passed.\n");
   } else {
