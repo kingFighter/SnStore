@@ -3,11 +3,11 @@ option java_generic_services = true;
 option py_generic_services = true;
 
 message BeginRequest {
-	required int32 txid = 1;
+	
 }
 
 message BeginResponse {
-	optional bool result = 1;
+	required int32 txid = 1;
 }
 
 message TxRequest {
