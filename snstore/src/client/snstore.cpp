@@ -4,7 +4,6 @@ using namespace Kevin;
 using namespace google::protobuf;
 
 SnStore::SnStore() {
-    tx = false;
     try
     {
         RCF::init();
@@ -18,14 +17,45 @@ SnStore::SnStore() {
 
 void SnStore::beginTx()
 {
-    tx = true;
+    if (current_request.txid() != DEFAULT_TX_ID) {
+        cout<<"cannot begin transaction that has started"<<endl;
+        return;
+    }
+    try
+    {
+        BeginRequest request;
+        BeginResponse response;
+        RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
+        DbService::Stub stub(&channel);
+
+        std::string strRequest;
+        TextFormat::PrintToString(request, &strRequest);
+        Debug("Sending request:" << std::endl);
+        Debug("strRequest << std::endl");
+
+        // Make a synchronous remote call to server.
+        stub.begin(NULL,&request, &response, NULL);
+
+        // Print out response.
+        std::string strResponse;
+        TextFormat::PrintToString(response, &strResponse);
+        Debug("Received response:" << std::endl);
+        Debug(strResponse << std::endl);
+
+        current_request.set_txid(response.txid());
+    }
+    catch(const RCF::Exception & e)
+    {
+        Debug("RCF::Exception: " << e.getErrorString() << std::endl);
+        return ;
+    }
+
 }
 
 void SnStore::commit()
 {
-    if (!tx)
+    if (current_request.txid() == DEFAULT_TX_ID)
         return;
-    tx = false;
     Debug(tx_args<<std::endl);
 
     //call rpc to execute transaction
@@ -54,26 +84,27 @@ void SnStore::commit()
         for(; it != rst.end(); it++)
           Debug(it->key()<<","<<it->value()<<std::endl);
         current_request.clear_reqs();
+        current_request.clear_txid();
     }
     catch(const RCF::Exception & e)
     {
         Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         current_request.clear_reqs();
+        current_request.clear_txid();
         return ;
     }
-
 }
 
 string SnStore::get(int key) {
-    TxRequest_Request * req = current_request.add_reqs();
-    req->set_op(TxRequest_Request::GET);
-    req->set_key1(key);
-    if (tx)
-    {
-        return "";
+    if (current_request.txid() != DEFAULT_TX_ID && cache.count(key) != 0) {
+        return cache[key];
     }
     try
     {
+        TxRequest_Request * req = current_request.add_reqs();
+        req->set_op(TxRequest_Request::GET);
+        req->set_key1(key);
+
         TxResponse response;
         RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
         DbService::Stub stub(&channel);
@@ -93,7 +124,13 @@ string SnStore::get(int key) {
         Debug(strResponse << std::endl);
         RepeatedPtrField<TxResponse_Map> ret = response.retvalue();
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
-        current_request.clear_reqs();
+
+        if (current_request.txid() != DEFAULT_TX_ID) { //this is a transaction request
+            cache[key] = it->value();
+        }
+        else {
+            current_request.clear_reqs();
+        }
         return it->value();
     }
     catch(const RCF::Exception & e)
@@ -109,10 +146,12 @@ void SnStore::put(int key, string value) {
     req->set_op(TxRequest_Request::PUT);
     req->set_key1(key);
     req->set_value(value);
-    if (tx)
-    {
+
+    if (current_request.txid() != DEFAULT_TX_ID) {//this is a transaction request
+        cache[key] = value;
         return;
     }
+
     try
     {
         TxResponse rsponse;
@@ -143,16 +182,27 @@ void SnStore::put(int key, string value) {
 }
 vector<string> SnStore::getRange(int minkey, int maxkey) {
     vector<string> v;
-    TxRequest_Request * req = current_request.add_reqs();
-    req->set_op(TxRequest_Request::GETRANGE);
-    req->set_key1(minkey);
-    req->set_key2(maxkey);
-    if (tx)
-    {
-        return v;
+    if (current_request.txid() != DEFAULT_TX_ID) {//this is a transaction request
+        for (int i = minkey; i <= maxkey ;i++) {
+            if (cache.count(i) != 0) {
+                v.push_back(cache[i]);
+                if (i == maxkey)
+                    return v;
+            }
+            else {
+                v.clear();
+                break;
+            }
+        }
     }
+
     try
     {
+        TxRequest_Request * req = current_request.add_reqs();
+        req->set_op(TxRequest_Request::GETRANGE);
+        req->set_key1(minkey);
+        req->set_key2(maxkey);
+
         TxResponse rsponse;
         RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
         DbService::Stub stub(&channel);
@@ -171,9 +221,13 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
         Debug(strResponse << std::endl);
         RepeatedPtrField<TxResponse_Map> ret = rsponse.retvalue();
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
-        for(; it != ret.end(); it++)
+        for(; it != ret.end(); it++) {
             v.push_back(it->value());
-        current_request.clear_reqs();
+            if(current_request.txid() != DEFAULT_TX_ID)
+                cache[it->key()] = it->value();
+        }
+        if (current_request.txid() == DEFAULT_TX_ID)
+            current_request.clear_reqs();
         return v;
     }
     catch(const RCF::Exception & e)

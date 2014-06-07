@@ -19,6 +19,7 @@ public:
     void execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done);
 
 private:
+    int txid;
 //	thread[] workerThreads;
 //
 //	int local_execTx(std::string args, Transaction r);

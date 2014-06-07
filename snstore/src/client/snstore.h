@@ -2,6 +2,7 @@
 #define SNSTORE_H
 #include <vector>
 #include <string>
+#include <map>
 #include <RCFProto.hpp>
 #include "../RCFProto/snstore.pb.h"
 #include <google/protobuf/text_format.h>
@@ -18,8 +19,8 @@ namespace Kevin {
     void beginTx();
     void commit();
   private:
-    bool tx;
     TxRequest current_request;
+    map<int,string> cache;
   };
 }
 #endif

@@ -86,7 +86,7 @@ void testCorrectness() {
   /*  srand(time(NULL));*/
   cout << "Generate Random db key and values.\n";
   for (int i = 0; i < NUM; ++i) {
-    int key = rand() % 10;
+    int key = i + 1;
     int len = rand() % 10 + 1;
     string value = genRandomString(len);
     dbKV.insert(make_pair(key, value));
