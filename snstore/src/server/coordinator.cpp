@@ -12,6 +12,13 @@ Coordinator::~Coordinator()
 }
 
 void
+Coordinator::begin(RpcController* controller, const BeginRequest* request, BeginResponse* response, Closure* done)
+{
+    int id = request->txid();
+    done->Run();
+}
+
+void
 Coordinator::execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done)
 {
     RepeatedPtrField<TxRequest_Request> reqs = request->reqs();

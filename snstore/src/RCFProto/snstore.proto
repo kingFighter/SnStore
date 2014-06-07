@@ -3,11 +3,11 @@ option java_generic_services = true;
 option py_generic_services = true;
 
 message BeginRequest {
-	required int32 txid;
+	required int32 txid = 1;
 }
 
 message BeginResponse {
-	optional bool result;
+	optional bool result = 1;
 }
 
 message TxRequest {
@@ -23,7 +23,7 @@ message TxRequest {
 		optional int32 key2 = 4;
 	}
 	repeated Request reqs = 1;
-	optional int32 txid;
+	optional int32 txid = 2;
 }
 
 message TxResponse {
@@ -36,6 +36,6 @@ message TxResponse {
 
 service DbService
 {
-	rpc begin(BeginRequest) returns (BeginResponse)
+	rpc begin(BeginRequest) returns (BeginResponse);
 	rpc execTx(TxRequest) returns (TxResponse);
 }
