@@ -4,8 +4,10 @@
 
 class Worker {
 public:
-	Worker();
-	~Worker();
+  Worker(){};
+  ~Worker(){};
 private:
 		
-}
+};
+
+#endif

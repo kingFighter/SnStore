@@ -2,9 +2,11 @@
 
 std::map<int,std::string> db;
 
-Coordinator::Coordinator(int worker_num, int max_key)
+Coordinator::Coordinator(int worker_num, int down_, int up_) : down(down_), up(up_)
 {
     txid = 1;
+    for (int i = 0; i < worker_num; ++i) 
+      workers.push_back(Worker());
 }
 
 Coordinator::~Coordinator()
@@ -21,6 +23,8 @@ Coordinator::begin(RpcController* controller, const BeginRequest* request, Begin
 void
 Coordinator::execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done)
 {
+  int32 txidReqs = request->txid();
+  
     RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
     RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
     for(;it != reqs.end(); it++) {
