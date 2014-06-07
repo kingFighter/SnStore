@@ -83,11 +83,13 @@ void testCorrectness() {
   map<int, string> dbKV;
   const int NUM = 10;
   const int SENUM = 20;
+  const int KEY_LIMIT = 100;
+  const int VALUE_LEN_LIMIT = 10;
   /*  srand(time(NULL));*/
   cout << "Generate Random db key and values.\n";
   for (int i = 0; i < NUM; ++i) {
-    int key = rand() % 100; 
-    int len = rand() % 10 + 1;
+    int key = rand() % KEY_LIMIT;
+    int len = rand() % VALUE_LEN_LIMIT + 1;
     string value = genRandomString(len);
     dbKV.insert(make_pair(key, value));
   }
@@ -106,6 +108,8 @@ void testCorrectness() {
   cout << string(SENUM, '*') << endl;
   cout << "Test Correctness.\n";
   cout << string(SENUM, '-') << endl;
+  
+  // Test put&get
   cout << "Test put&get functions: \n";
   bool passed = true;
   for (it = dbKV.begin(); it != dbKV.end(); it++) {
@@ -120,7 +124,9 @@ void testCorrectness() {
     allPassed = false;
   }
   cout << string(SENUM, '-') << endl << endl;
+  // End of put&get
 
+  // Test getRange
   cout << string(SENUM, '-') << endl;
   cout << "Test getRange function: \n";
   passed = true;
@@ -144,15 +150,110 @@ void testCorrectness() {
     allPassed = false;
   }
   cout << string(SENUM, '-') << endl << endl;
-  
+  // End getRange
+
+  // Test transaction
+  cout << string(SENUM, '-') << endl;
+  cout << "Test transaction: \n";
+  passed = true;
+  bool twoPassed = true;
+  cout << string(SENUM, '+') << endl;
+  cout << "Test transaction commit sucessful.\n";
+  // transaction commit successful test
+  int key = rand() % KEY_LIMIT;
+  string v = db.get(key);
+  SnStore anotherDb;
+  // We can replace the testKeyMin, testKeyMax if needed
+  int testKeyMin = minKey;
+  int testKeyMax = maxKey;
+  rangeValue = db.getRange(testKeyMin, testKeyMax);
+  // begin tx
+  db.beginTx();
+  // test get() before put()
+  cout << "Test get before put:\n";
+  if (!expect(v, db.get(key))) {
+    failRed("Test get before put failed\n");
+    passed = false;
+  } else {
+    passGreen("Test get before put passed.\n");
+  }
+
+  // test getRange in commit 
+  if (db.getRange(testKeyMin, testKeyMax) != rangeValue) {
+    failRed("Test getRange in commit failed\n");
+    passed = false;
+  } else {
+    passGreen("Test getRange in commit passed\n");
+  }
+  int len = rand() % VALUE_LEN_LIMIT + 1;
+  string value = genRandomString(len);
+  db.put(key, value);
+  string vv = db.get(key);
+  vector<string> inCommitRange = db.getRange(testKeyMin, testKeyMax);
+  // We cannot test whether put is updated by server before commit
+  // because this commit get lock.
+  db.commit();
+  // end commit
+  // test get() after put()
+  v = db.get(key);
+  if (!expect(v, vv)) {
+    failRed("Test get after put failed\n");
+    passed = false;
+  } else {
+    passGreen("Test get after put passed\n");
+  }
+
+  rangeValue = db.getRange(testKeyMin, testKeyMax);
+  if (rangeValue != inCommitRange) {
+    failRed("Test getRange after commit failed\n");
+    passed = false;
+  } else {
+    passGreen("Test getRange after commit passed\n");
+  }
+
+  // test put after commit is saved by server
+  if (!expect(vv, anotherDb.get(key))) {
+    passed = false;
+    failRed("Test put after commit failed\n");
+  } else {
+    passGreen("Test put after commit passed\n");
+  }
+  cout << string(SENUM, '+') << endl;
   if (passed) {
+    passGreen("Test transaction commit successful passed.\n");
+  } else {
+    failRed("Test transaction commit successful failed.\n");
+    twoPassed = false;
+    allPassed = false;
+  }
+  cout << string(SENUM, '+') << endl << endl;
+
+  passed = true;
+  cout << string(SENUM, '+') << endl;
+  cout << "Test transaction commit abort.\n";
+  // transaction commit abort test
+
+  
+  cout << string(SENUM, '+') << endl;
+  if (passed) {
+    passGreen("Test transaction commit abort passed.\n");
+  } else {
+    failRed("Test transaction commit abort failed.\n");
+    allPassed = false;
+    twoPassed = false;
+  }
+  cout << string(SENUM, '+') << endl << endl;
+  
+  
+  if (twoPassed) {
     passGreen("Test transaction passed.\n");
   } else {
     failRed("Test transaction failed.\n");
     allPassed = false;
   }
   cout << string(SENUM, '-') << endl << endl;
-  
+  // End transaction
+
   if (allPassed) {
     passGreen("Test All passed.\n");
   } else {
@@ -166,6 +267,9 @@ void testPerformance() {
   SnStore dbPer;
   clock_t start, finish;
   const int SENUM = 20;
+  const int KEY_LIMIT = 100;
+  const int VALUE_LEN_LIMIT = 10;
+
   double totalTime;
   cout << string(SENUM, '*') << endl;
   cout << "Test Performance.\n";
@@ -201,5 +305,28 @@ void testPerformance() {
   totalTime = (double)(finish - start) / CLOCKS_PER_SEC;
   cout << "Time: " << totalTime << "s\n";
   cout << string(SENUM, '-') << endl << endl;
+
+  cout << string(SENUM, '-') << endl;
+  cout << "Test transaction performance with " << TEST_NUM << " :\n";
+  start = clock();
+  dbPer.beginTx();
+  for (int i = 0; i < TEST_NUM; ++i) {
+    dbPer.get(rand() % KEY_LIMIT);
+    int len = rand() % VALUE_LEN_LIMIT + 1;
+    string value = genRandomString(len);
+    dbPer.put(rand() % KEY_LIMIT, value);
+    int minKey = rand() % KEY_LIMIT;
+    int maxKey = rand() % KEY_LIMIT;
+    if (minKey > maxKey)
+      swap(minKey, maxKey);
+    dbPer.getRange(minKey, maxKey);
+  }
+  dbPer.commit();
+
+  finish = clock();
+  totalTime = (double)(finish - start) / CLOCKS_PER_SEC;
+  cout << "Time: " << totalTime << "s\n";
+  cout << string(SENUM, '-') << endl << endl;
+
 }
 

@@ -4,6 +4,7 @@
 #include <string>
 #include <map>
 #include <RCFProto.hpp>
+
 #include "../RCFProto/snstore.pb.h"
 #include <google/protobuf/text_format.h>
 #include "../utility/utility.h"
