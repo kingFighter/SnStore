@@ -16,3 +16,5 @@ SnStore.cbp
 snstore.depend
 SnStore.depend
 snstore.layout
+snstore.pb.cc
+snstore.pb.h

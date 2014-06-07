@@ -5,7 +5,7 @@
 #include <RCFProto.hpp>
 #include "../RCFProto/snstore.pb.h"
 #include <google/protobuf/text_format.h>
-#include "../utility/debug.h"
+#include "../utility/utility.h"
 
 using namespace std;
 namespace Kevin {

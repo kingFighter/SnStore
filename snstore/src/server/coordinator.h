@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 #include <pthread.h>
-#include "../utility/debug.h"
+#include "../utility/utility.h"
 
 using namespace google::protobuf;
 

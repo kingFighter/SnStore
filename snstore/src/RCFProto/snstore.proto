@@ -2,6 +2,14 @@ option cc_generic_services = true;
 option java_generic_services = true;
 option py_generic_services = true;
 
+message BeginRequest {
+	required int32 txid;
+}
+
+message BeginResponse {
+	optional bool result;
+}
+
 message TxRequest {
 	message Request {
 		enum OpCode {
@@ -15,6 +23,7 @@ message TxRequest {
 		optional int32 key2 = 4;
 	}
 	repeated Request reqs = 1;
+	optional int32 txid;
 }
 
 message TxResponse {
@@ -27,5 +36,6 @@ message TxResponse {
 
 service DbService
 {
+	rpc begin(BeginRequest) returns (BeginResponse)
 	rpc execTx(TxRequest) returns (TxResponse);
 }

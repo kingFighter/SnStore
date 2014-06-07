@@ -1,6 +1,8 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#define DEFAULT_TX_ID 0
+
 #ifdef USEDEBUG
 #include <iostream>
 #define Debug(x) std::cerr << x
