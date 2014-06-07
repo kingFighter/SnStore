@@ -86,7 +86,7 @@ void testCorrectness() {
   /*  srand(time(NULL));*/
   cout << "Generate Random db key and values.\n";
   for (int i = 0; i < NUM; ++i) {
-    int key = i + 1;
+    int key = rand() % 100; 
     int len = rand() % 10 + 1;
     string value = genRandomString(len);
     dbKV.insert(make_pair(key, value));
@@ -96,11 +96,9 @@ void testCorrectness() {
   SnStore db;
   map<int, string>::const_iterator it;
   set<int> dbKey;
-  set<string> dbValue;
   for (it = dbKV.begin(); it != dbKV.end(); it++) {
     db.put(it->first, it->second);
     dbKey.insert(it->first);
-    dbValue.insert(it->second);
   }
 
 
@@ -127,21 +125,34 @@ void testCorrectness() {
   cout << "Test getRange function: \n";
   passed = true;
   int minKey = *min_element(dbKey.begin(),dbKey.end());
-  cerr << "minKey" << minKey << endl;
   int maxKey = *max_element(dbKey.begin(),dbKey.end());
-  cerr << "maxKey" << maxKey << endl;
   vector<string> rangeValue = db.getRange(minKey, maxKey);
-  sort(rangeValue.begin(), rangeValue.end());
-  vector<string> dbValueCopy(dbValue.begin(), dbValue.end());
-  sort(dbValueCopy.begin(), dbValueCopy.end());
-  if (rangeValue == dbValueCopy) {
+  int size = maxKey - minKey;
+  // cerr << dbKV.size() << " " << size << endl;
+  for (int i = 0; i <= size; ++i) {
+    // cerr << rangeValue[i] << " " << dbKV[i + minKey] << endl;
+    if (rangeValue[i] != dbKV[i + minKey]) {
+      passed = false;
+      break;
+    }
+  }
+
+  if (passed) {
     passGreen("Test getRange function passed.\n");
   } else {
     failRed("Test getRange function failed.\n");
     allPassed = false;
   }
   cout << string(SENUM, '-') << endl << endl;
-
+  
+  if (passed) {
+    passGreen("Test transaction passed.\n");
+  } else {
+    failRed("Test transaction failed.\n");
+    allPassed = false;
+  }
+  cout << string(SENUM, '-') << endl << endl;
+  
   if (allPassed) {
     passGreen("Test All passed.\n");
   } else {
