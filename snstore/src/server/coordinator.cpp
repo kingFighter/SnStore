@@ -16,6 +16,8 @@ Coordinator::Coordinator(int worker_num, int down_, int up_) : down(down_), up(u
     workers.push_back(Worker());
     operations.push_back(queue<string>());
     results.push_back(queue<string>());
+    workers[i].set(&(operations[i]), &(results[i]), &operations_con);
+    workers[i].start();
   }
   processThread = boost::thread(&Coordinator::processResults, this);
 }
