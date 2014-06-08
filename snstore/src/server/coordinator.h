@@ -36,8 +36,18 @@ private:
     /* each worker has a operations queue, a result queue and an */
     /* operation queue condition  */
     vector<queue<string> > operations;
+    /* results: receive and combine the results */
     vector<queue<string> > results;
-    vector<boost::condition_variable> conditions;
+    
+    /* get values and in order */
+    queue<string> reGet;
+    /* getRange values  ans in order */
+    queue<vector<string> > reGetRange;
+    /* put values is not needed now */
+
+    /* vector<boost::condition_variable> conditions; */
+    /* We may improvement the performance by conditions */
+    boost::condition_variable operations_con;
     /* global_mutex used as global lock */
     boost::mutex global_mutex;
     boost::mutex results_mutex;

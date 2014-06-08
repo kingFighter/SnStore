@@ -48,6 +48,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
     RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
     
     // split request
+    // For now the operationsWakeup is useless.
     set<int> operationsWakeup;
     for(;it != reqs.end(); it++) {
       switch (it->op()) {
@@ -92,49 +93,45 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
           operationsWakeup.insert(i);
           (operations[i]).push(str + int2string((i - 1) * size ) + " " + int2string(i * size - 1));
         }
-        
         break;
       }
       }
     }
+    operations_con.notify_all();
+    {
+      boost::mutex::scoped_lock lock(request_mutex);
+      while (num > 0)
+        request_con.wait(lock);
 
-    for(;it != reqs.end(); it++) {
+      // Deal with results
+      for(;it != reqs.end(); it++) {
         switch (it->op()) {
-            case TxRequest_Request::GET:
-            {
-                int getkey = it->key1();
-                TxResponse_Map* ret = response->add_retvalue();
-                ret->set_key(getkey);
-                if (db.count(getkey) != 0)
-                    ret->set_value(db[getkey]);
-                else
-                    ret->set_value("");
-                break;
+        case TxRequest_Request::GET: {
+            int getkey = it->key1();
+            TxResponse_Map* ret = response->add_retvalue();
+            ret->set_key(getkey);
+            ret->set_value(reGet.front());
+            reGet.pop();
+            break;
+          }
+        case TxRequest_Request::PUT: {
+            break;
+          }
+        case TxRequest_Request::GETRANGE: {
+            int minkey = it->key1();
+            int maxkey = it->key2();
+            vector<string> v = reGetRange.front();
+            reGetRange.pop();
+            for (int i = 0; i < v.size(); ++i) {
+              TxResponse_Map * ret = response->add_retvalue();
+              ret->set_key(i + minkey);
+              ret->set_value(v[i]);
             }
-            case TxRequest_Request::PUT:
-            {
-                int putkey = it->key1();
-                string value = it->value();
-                db[putkey] = value;
-                break;
-            }
-            case TxRequest_Request::GETRANGE:
-            {
-                int minkey = it->key1();
-                int maxkey = it->key2();
-                for (int i = minkey; i <= maxkey; i++) {
-                    TxResponse_Map * ret = response->add_retvalue();
-                    ret->set_key(i);
-                    if (db.count(i) != 0) {
-                        ret->set_value(db[i]);
-                    }
-                    else
-                        ret->set_value("");
-                }
-                break;
-            }
-        }
-    }
+            break;
+          }
+        } // end switch
+      } // end for
+    } // end scope
     done->Run();
   }
 }
