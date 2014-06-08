@@ -11,6 +11,11 @@
 #include "worker.h"
 #include <boost/thread.hpp>
 #include <queue>
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
+
 
 using namespace google::protobuf;
 
@@ -35,15 +40,25 @@ private:
     vector<Worker> workers;
     /* each worker has a operations queue, a result queue and an */
     /* operation queue condition  */
+    /* operations queue format: */
+    /*   get key */
+    /*   put key value */
+    /*   getRange minKey maxKey */
     vector<queue<string> > operations;
     /* results: receive and combine the results */
+    /* results queue format: */
+    /*   get key value */
+    /*   put false/true */
+    /*   getRange minKey maxKey value1 value2 ..  */
     vector<queue<string> > results;
     
-    /* get values and in order */
-    queue<string> reGet;
-    /* getRange values  ans in order */
-    queue<vector<string> > reGetRange;
+    /* get values and out of order */
+    map<int, string> reGet;
+    /* getRange values  and out of  order */
+    map<pair<int, int>, vector<string> > reGetRange;
     /* put values is not needed now */
+    /* minMaxV help to getRange */
+    vector<pair<int, int> > minMaxV;
 
     /* vector<boost::condition_variable> conditions; */
     /* We may improvement the performance by conditions */
@@ -55,6 +70,9 @@ private:
     boost::condition_variable request_con;
     boost::condition_variable results_con;
     boost::condition_variable global_con;
+
+    boost::thread processThread;
+
     int getPos(int key) {
       if (key < down) {
         return 0;
@@ -63,15 +81,8 @@ private:
       } else {
         return (key / size + 1);
       }
-      
     }
+    
+    void processResults();
 };
 #endif
-
-
-
-
-
-
-
-

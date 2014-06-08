@@ -7,3 +7,5 @@
 2. abort
 ** transaction
 improvement
+** Others
+1. coordinate state clear after each transaction

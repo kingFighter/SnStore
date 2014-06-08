@@ -17,6 +17,7 @@ Coordinator::Coordinator(int worker_num, int down_, int up_) : down(down_), up(u
     operations.push_back(queue<string>());
     results.push_back(queue<string>());
   }
+  processThread = boost::thread(&Coordinator::processResults, this);
 }
 
 Coordinator::~Coordinator()
@@ -63,8 +64,9 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
       }
       case TxRequest_Request::PUT: {
         int putkey = it->key1();
+        string value = it->value();
         ++num;
-        string str = "put " + int2string(putkey);
+        string str = "put " + int2string(putkey) + " " + value;
         int pos = getPos(putkey);
         operationsWakeup.insert(pos);
         (operations[pos]).push(str);
@@ -89,7 +91,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
           operationsWakeup.insert(posMin);
         }
         
-        for (int i = posMin + 1; i <= posMax; ++i) {
+        for (int i = posMin + 1; i < posMax; ++i) {
           operationsWakeup.insert(i);
           (operations[i]).push(str + int2string((i - 1) * size ) + " " + int2string(i * size - 1));
         }
@@ -110,8 +112,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
             int getkey = it->key1();
             TxResponse_Map* ret = response->add_retvalue();
             ret->set_key(getkey);
-            ret->set_value(reGet.front());
-            reGet.pop();
+            ret->set_value(reGet[getkey]);
             break;
           }
         case TxRequest_Request::PUT: {
@@ -120,8 +121,8 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
         case TxRequest_Request::GETRANGE: {
             int minkey = it->key1();
             int maxkey = it->key2();
-            vector<string> v = reGetRange.front();
-            reGetRange.pop();
+            minMaxV.push_back(make_pair(minkey, maxkey));
+            vector<string> v = reGetRange[make_pair(minkey, maxkey)];
             for (int i = 0; i < v.size(); ++i) {
               TxResponse_Map * ret = response->add_retvalue();
               ret->set_key(i + minkey);
@@ -134,4 +135,77 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
     } // end scope
     done->Run();
   }
+}
+
+void Coordinator::processResults() {
+  while (true) {
+    {
+      
+      boost::mutex::scoped_lock lock(results_mutex);
+      // We can improve this later.
+      bool empty = true;
+      while (empty) {
+        for (int i = 0; i < results.size(); ++i) {
+          if (!results[i].empty()) {
+            empty = false;
+            break;
+          }
+        }
+        if (empty) 
+          results_con.wait(lock);
+      }
+
+      Debug("Server process results.\n");
+      for (int i = 0; i < results.size(); ++i) {
+        if (!((results[i]).empty())) {
+          --num;
+        }
+        while (!((results[i]).empty())) {
+          Debug("Server Processing.\n");
+          string str = results[i].front();
+          results[i].pop();
+          istringstream iss(str);
+          vector<string> tokens;
+          copy(istream_iterator<string>(iss),
+               istream_iterator<string>(),
+               back_inserter<vector<string> >(tokens));
+
+          if ("get" == tokens[0]) {
+            reGet[string2int(tokens[1])] = tokens[2];
+          } else if ("put" == tokens[0]) {
+            // nothing to do
+          } else if ("getRange" == tokens[0]) {
+            vector<string> getRangeValues (tokens.begin() + 3, tokens.end());
+            reGetRange[make_pair(string2int(tokens[1]), string2int(tokens[2]))] = getRangeValues;
+          }
+        } // end while results[i].empty()
+      }   // end for results.size()
+      
+      for (int i = 0; i < minMaxV.size(); ++i) {
+        pair<int, int> mmv = minMaxV[i];
+        // Across worker
+        if (0 == reGetRange.count(mmv)) {
+          int minKey = mmv.first;
+          int maxKey = mmv.second;
+          
+          int posMin = getPos(minkey);
+          int posMax = getPos(maxkey);
+          num += posMax - posMin + 1;
+          
+          pair<int, int> p = make_pair(minkey, (posMin * size - 1));
+          vector<string> getRangeValues(reGetRange[p].begin(), reGetRange[p].end());
+          for (int i = posMin + 1; i < posMax; ++i) {
+            p = make_pair((i - 1) * size, i * size - 1);
+            getRangeValues.insert(reGetRange[p].begin(), reGetRange[p].end());
+          }
+          p = make_pair((posMax - 1) * size, maxKey);
+          getRangeValues.insert(reGetRange[p].begin(), reGetRange[p].end());
+          reGetRange[mmv] = getRangeValues;
+        } // end reGetRange.count(mmv)
+      }
+      request_con.notify_all();
+      Debug("Server process done\n");
+    }
+  }
+
 }
