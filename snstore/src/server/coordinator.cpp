@@ -188,18 +188,18 @@ void Coordinator::processResults() {
           int minKey = mmv.first;
           int maxKey = mmv.second;
           
-          int posMin = getPos(minkey);
-          int posMax = getPos(maxkey);
+          int posMin = getPos(minKey);
+          int posMax = getPos(maxKey);
           num += posMax - posMin + 1;
           
-          pair<int, int> p = make_pair(minkey, (posMin * size - 1));
+          pair<int, int> p = make_pair(minKey, (posMin * size - 1));
           vector<string> getRangeValues(reGetRange[p].begin(), reGetRange[p].end());
           for (int i = posMin + 1; i < posMax; ++i) {
             p = make_pair((i - 1) * size, i * size - 1);
-            getRangeValues.insert(reGetRange[p].begin(), reGetRange[p].end());
+            getRangeValues.insert(getRangeValues.end(), reGetRange[p].begin(), reGetRange[p].end());
           }
           p = make_pair((posMax - 1) * size, maxKey);
-          getRangeValues.insert(reGetRange[p].begin(), reGetRange[p].end());
+          getRangeValues.insert(getRangeValues.end(), reGetRange[p].begin(), reGetRange[p].end());
           reGetRange[mmv] = getRangeValues;
         } // end reGetRange.count(mmv)
       }
