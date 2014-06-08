@@ -17,7 +17,7 @@ SnStore::SnStore() {
 
 void SnStore::beginTx()
 {
-    if (current_request.txid() != DEFAULT_TX_ID) {
+    if (current_request.istx()) {
         cout<<"cannot begin transaction that has started"<<endl;
         return;
     }
@@ -43,6 +43,7 @@ void SnStore::beginTx()
         Debug(strResponse << std::endl);
 
         current_request.set_txid(response.txid());
+		current_request.set_istx(true);
     }
     catch(const RCF::Exception & e)
     {
@@ -54,7 +55,7 @@ void SnStore::beginTx()
 
 void SnStore::commit()
 {
-    if (current_request.txid() == DEFAULT_TX_ID)
+    if (!current_request.istx())
         return;
 
     //call rpc to execute transaction
@@ -84,23 +85,26 @@ void SnStore::commit()
           Debug(it->key()<<","<<it->value()<<std::endl);
         current_request.clear_reqs();
         current_request.clear_txid();
+		current_request.clear_istx();
     }
     catch(const RCF::Exception & e)
     {
         Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         current_request.clear_reqs();
         current_request.clear_txid();
+		current_request.clear_istx();
         return ;
     }
 }
 
 string SnStore::get(int key) {
-    if (current_request.txid() != DEFAULT_TX_ID && cache.count(key) != 0) {
+    if (current_request.istx() && cache.count(key) != 0) {
         return cache[key];
     }
     try
     {
         TxRequest request;
+		request.set_istx(false);
         TxRequest_Request * req = request.add_reqs();
         req->set_op(TxRequest_Request::GET);
         req->set_key1(key);
@@ -125,7 +129,7 @@ string SnStore::get(int key) {
         RepeatedPtrField<TxResponse_Map> ret = response.retvalue();
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
 
-        if (current_request.txid() != DEFAULT_TX_ID) { //this is a transaction request
+        if (current_request.istx()) { //this is a transaction request
             if (it->value() != "")//the value exists
                 cache[key] = it->value();
         }
@@ -144,13 +148,14 @@ void SnStore::put(int key, string value) {
     req->set_key1(key);
     req->set_value(value);
 
-    if (current_request.txid() != DEFAULT_TX_ID) {//this is a transaction request
+    if (current_request.istx()) {//this is a transaction request
         cache[key] = value;
         return;
     }
 
     try
     {
+		current_request.set_istx(false);
         TxResponse rsponse;
         RCF::RcfProtoChannel channel( RCF::TcpEndpoint("127.0.0.1", 50001) );
         DbService::Stub stub(&channel);
@@ -169,17 +174,19 @@ void SnStore::put(int key, string value) {
         Debug("Received response:" << std::endl);
         Debug(strResponse << std::endl);
         current_request.clear_reqs();
+		current_request.clear_istx();
     }
     catch(const RCF::Exception & e)
     {
         Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         current_request.clear_reqs();
+		current_request.clear_istx();
         return ;
     }
 }
 vector<string> SnStore::getRange(int minkey, int maxkey) {
     vector<string> v;
-    if (current_request.txid() != DEFAULT_TX_ID) {//this is a transaction request
+    if (current_request.istx()) {//this is a transaction request
         for (int i = minkey; i <= maxkey ;i++) {
             if (cache.count(i) != 0) {
                 v.push_back(cache[i]);
@@ -196,6 +203,7 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
     try
     {
         TxRequest request;
+		request.set_istx(false);
         TxRequest_Request * req = request.add_reqs();
         req->set_op(TxRequest_Request::GETRANGE);
         req->set_key1(minkey);
@@ -220,7 +228,7 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
         RepeatedPtrField<TxResponse_Map> ret = rsponse.retvalue();
         RepeatedPtrField<TxResponse_Map>::iterator it = ret.begin();
         for(; it != ret.end(); it++) {
-            if (current_request.txid() != DEFAULT_TX_ID) {//transaction
+            if (current_request.istx()) {//transaction
                 if (it->value() != "") {//\ and not ""
                     cache[it->key()] = it->value();
                 }

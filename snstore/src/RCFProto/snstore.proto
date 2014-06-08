@@ -23,7 +23,8 @@ message TxRequest {
 		optional int32 key2 = 4;
 	}
 	repeated Request reqs = 1;
-	optional int32 txid = 2;
+	required bool istx = 2;
+	optional int32 txid = 3;
 }
 
 message TxResponse {
