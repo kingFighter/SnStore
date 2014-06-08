@@ -9,5 +9,8 @@
 improvement
 ** Others
 1. coordinate state clear after each transaction
-2. 返回空串情况的检查
-3. server端的cache
+2. server cache to improvement performance
+* Bugs
+1. return not existing value bugs(A:define format)
+2. operations elements(same get, different id)(A:define format)
+3. ordinary put,get handle.(distinguish transaction)

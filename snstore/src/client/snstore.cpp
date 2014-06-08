@@ -56,7 +56,6 @@ void SnStore::commit()
 {
     if (current_request.txid() == DEFAULT_TX_ID)
         return;
-    Debug(tx_args<<std::endl);
 
     //call rpc to execute transaction
     try

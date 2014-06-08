@@ -18,6 +18,7 @@ Coordinator::Coordinator(int worker_num, int down_, int up_) : down(down_), up(u
     operations.push_back(queue<string>());
     results.push_back(queue<string>());
   }
+  Debug("Coordinator constructor.\n");
 }
 
 void Coordinator::start() {
@@ -53,12 +54,14 @@ void
 Coordinator::execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done)
 {
   int32 txidReqs = request->txid();
+  Debug("Enter execTx.\n");
   // get transaction lock
   {
     boost::mutex::scoped_lock lock(global_mutex);
     while (txidReqs != holder)
       global_con.wait(lock);
   }
+  Debug("Get global lock.\n");
   {
     boost::mutex::scoped_lock lock(request_mutex);
     RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
@@ -114,26 +117,31 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
         break;
       }
       }
-    }
-    operations_con.notify_all();
-    {
-      boost::mutex::scoped_lock lock(request_mutex);
-      while (num > 0)
-        request_con.wait(lock);
 
+      operations_con.notify_all();
+      while (num > 0) {
+        Debug("Split request and sleep.\n");
+        request_con.wait(lock);
+      }
+      
+      Debug("execTx wakeup and enter deal with results.\n");
       // Deal with results
-      for(;it != reqs.end(); it++) {
+      RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
+      for(it = reqs.begin(); it != reqs.end(); it++) {
+        Debug("execTx: Op " << it->op() << endl); 
         switch (it->op()) {
         case TxRequest_Request::GET: {
-            int getkey = it->key1();
-            TxResponse_Map* ret = response->add_retvalue();
-            ret->set_key(getkey);
-            ret->set_value(reGet[getkey]);
-            break;
-          }
+          int getkey = it->key1();
+          TxResponse_Map* ret = response->add_retvalue();
+          ret->set_key(getkey);
+          ret->set_value(reGet[getkey]);
+          Debug("execTx: return GET ( " << getkey << ", " << reGet[getkey] << ")");
+          break;
+        }
         case TxRequest_Request::PUT: {
-            break;
-          }
+          
+          break;
+        }
         case TxRequest_Request::GETRANGE: {
             int minkey = it->key1();
             int maxkey = it->key2();
@@ -152,6 +160,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
     
     // clear all
     initialize();
+    Debug("execTx done and return values.\n");
     done->Run();
   }
 }
@@ -180,8 +189,8 @@ void Coordinator::processResults() {
           --num;
         }
         while (!((results[i]).empty())) {
-          Debug("Server Processing.\n");
           string str = results[i].front();
+          Debug("Server Processing " << str << " \n");          
           results[i].pop();
           istringstream iss(str);
           vector<string> tokens;

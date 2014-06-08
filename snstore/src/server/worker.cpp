@@ -31,8 +31,10 @@ void Worker::processRequests() {
         if ("get" == tokens[0]) {
           string str = operation;
           str += " " + db[string2int(tokens[1])];
+          Debug("Worker get process:" << str << endl);
           results->push(str);
         } else if ("put" == tokens[0]) {
+          db[string2int(tokens[1])] = tokens[2];
           // Nothing now
           string str = "put true";
           results->push(str);

@@ -16,6 +16,7 @@
 #include <algorithm>
 #include <iterator>
 
+#include <google/protobuf/text_format.h>
 
 using namespace google::protobuf;
 

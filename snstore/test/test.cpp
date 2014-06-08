@@ -102,7 +102,7 @@ void testCorrectness() {
     db.put(it->first, it->second);
     dbKey.insert(it->first);
   }
-
+  cout << "SnStore is setup.\n ";
 
   bool allPassed = true;
   cout << string(SENUM, '*') << endl;
