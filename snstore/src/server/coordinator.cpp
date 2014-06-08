@@ -7,6 +7,7 @@ Coordinator::Coordinator(int worker_num, int down_, int up_) : down(down_), up(u
   txid = DEFAULT_TX_ID;
   holder = DEFAULT_TX_ID;
   size = (up - down) / (worker_num - 2);
+  startNum = 0;
   // worker[0]: (~,down)
   // worker[1]: [down, down + size)
   // worker[2]: [down + size, down + 2 * size)
@@ -16,12 +17,25 @@ Coordinator::Coordinator(int worker_num, int down_, int up_) : down(down_), up(u
     workers.push_back(Worker());
     operations.push_back(queue<string>());
     results.push_back(queue<string>());
-    workers[i].set(&(operations[i]), &(results[i]), &operations_con);
+  }
+}
+
+void Coordinator::start() {
+  if (0 != startNum)
+    return;
+
+  // worker[0]: (~,down)
+  // worker[1]: [down, down + size)
+  // worker[2]: [down + size, down + 2 * size)
+  // worker[worker_num - 2]: [up,~)
+  // conditions.resize(worker_num);
+  for (int i = 0; i < workers.size(); ++i) {
+    workers[i].set(&(operations[i]), &(results[i]), &operations_con, &results_con);
     workers[i].start();
   }
   processThread = boost::thread(&Coordinator::processResults, this);
+  startNum = 1;
 }
-
 Coordinator::~Coordinator()
 {
 }
@@ -135,6 +149,9 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
         } // end switch
       } // end for
     } // end scope
+    
+    // clear all
+    initialize();
     done->Run();
   }
 }

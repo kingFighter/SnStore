@@ -15,7 +15,8 @@ int main() {
 
         // Start the server.
         server.start();
-
+        
+        coor.start();
         // Wait for clients.
         std::cout << "Press Enter to exit." << std::endl;
         std::cin.get();

@@ -19,14 +19,18 @@
 
 using namespace google::protobuf;
 
+/* For now the value of db cannot be empty string */
 class Coordinator : public DbService{
 public:
   Coordinator(int worker_num, int down, int up);
+  void start();
 	~Coordinator();
 	void begin(RpcController* controller, const BeginRequest* request, BeginResponse* response, Closure* done);
     void execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done);
 
 private:
+    /* Server only start once */
+    int startNum;
     /* give each client a transactgion id*/
     int txid;
     /* holder has the global lock */
@@ -82,7 +86,24 @@ private:
         return (key / size + 1);
       }
     }
-    
+    void initialize() {
+      num = 0;
+      for (int i = 0; i < operations.size(); ++i) {
+        while (!operations[i].empty()) {
+          operations[i].pop();
+        }
+      }
+
+      for (int i = 0; i < results.size(); ++i) {
+        while (!results[i].empty()) {
+          results[i].pop();
+        }
+      }
+      reGet.clear();
+      reGetRange.clear();
+      minMaxV.clear();
+    }
+
     void processResults();
 };
 #endif

@@ -9,3 +9,5 @@
 improvement
 ** Others
 1. coordinate state clear after each transaction
+2. 返回空串情况的检查
+3. server端的cache
