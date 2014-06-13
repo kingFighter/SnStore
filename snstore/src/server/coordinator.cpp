@@ -63,116 +63,116 @@ Coordinator::getrange(RpcController* controller,GRRequest* request,GRResponse* r
 void
 Coordinator::execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done)
 {
-  int32 txidReqs = request->txid();
-  Debug("Enter execTx.\n");
-  // get transaction lock
-  {
-    boost::mutex::scoped_lock lock(global_mutex);
-    while (txidReqs != holder)
-      global_con.wait(lock);
-  }
-  Debug("Get global lock.\n");
-  {
-    boost::mutex::scoped_lock lock(request_mutex);
-    RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
-    RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
-
-    // split request
-    // For now the operationsWakeup is useless.
-    set<int> operationsWakeup;
-    for(;it != reqs.end(); it++) {
-      switch (it->op()) {
-      case TxRequest_Request::GET: {
-        int getkey = it->key1();
-        ++num;
-        string str = "get " + int2string(getkey);
-        int pos = getPos(getkey);
-        operationsWakeup.insert(pos);
-        (operations[pos]).push(str);
-        break;
-      }
-      case TxRequest_Request::PUT: {
-        int putkey = it->key1();
-        string value = it->value();
-        ++num;
-        string str = "put " + int2string(putkey) + " " + value;
-        int pos = getPos(putkey);
-        operationsWakeup.insert(pos);
-        (operations[pos]).push(str);
-        break;
-      }
-      case TxRequest_Request::GETRANGE: {
-        int minkey = it->key1();
-        int maxkey = it->key2();
-        // number and split
-        int posMin = getPos(minkey);
-        int posMax = getPos(maxkey);
-        num += posMax - posMin + 1;
-        // Split getRange
-        string str = "getRange ";
-        if (posMin != posMax) {
-          (operations[posMin]).push(str + int2string(minkey) + " " + int2string(posMin * size - 1));
-          operationsWakeup.insert(posMin);
-          (operations[posMax]).push(str + int2string((posMax - 1) * size) + " " + int2string(maxkey));
-          operationsWakeup.insert(posMax);
-        } else {
-          operations[posMin].push(str + int2string(minkey) + " " + int2string(maxkey));
-          operationsWakeup.insert(posMin);
-        }
-
-        for (int i = posMin + 1; i < posMax; ++i) {
-          operationsWakeup.insert(i);
-          (operations[i]).push(str + int2string((i - 1) * size ) + " " + int2string(i * size - 1));
-        }
-        break;
-      }
-      }
-
-      operations_con.notify_all();
-      while (num > 0) {
-        Debug("Split request and sleep.\n");
-        request_con.wait(lock);
-      }
-
-      Debug("execTx wakeup and enter deal with results.\n");
-      // Deal with results
-      RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
-      for(it = reqs.begin(); it != reqs.end(); it++) {
-        Debug("execTx: Op " << it->op() << endl);
-        switch (it->op()) {
-        case TxRequest_Request::GET: {
-          int getkey = it->key1();
-          TxResponse_Map* ret = response->add_retvalue();
-          ret->set_key(getkey);
-          ret->set_value(reGet[getkey]);
-          Debug("execTx: return GET ( " << getkey << ", " << reGet[getkey] << ")");
-          break;
-        }
-        case TxRequest_Request::PUT: {
-
-          break;
-        }
-        case TxRequest_Request::GETRANGE: {
-            int minkey = it->key1();
-            int maxkey = it->key2();
-            minMaxV.push_back(make_pair(minkey, maxkey));
-            vector<string> v = reGetRange[make_pair(minkey, maxkey)];
-            for (int i = 0; i < v.size(); ++i) {
-              TxResponse_Map * ret = response->add_retvalue();
-              ret->set_key(i + minkey);
-              ret->set_value(v[i]);
-            }
-            break;
-          }
-        } // end switch
-      } // end for
-    } // end scope
-
-    // clear all
-    initialize();
-    Debug("execTx done and return values.\n");
-    done->Run();
-  }
+//  int32 txidReqs = request->txid();
+//  Debug("Enter execTx.\n");
+//  // get transaction lock
+//  {
+//    boost::mutex::scoped_lock lock(global_mutex);
+//    while (txidReqs != holder)
+//      global_con.wait(lock);
+//  }
+//  Debug("Get global lock.\n");
+//  {
+//    boost::mutex::scoped_lock lock(request_mutex);
+//    RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
+//    RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
+//
+//    // split request
+//    // For now the operationsWakeup is useless.
+//    set<int> operationsWakeup;
+//    for(;it != reqs.end(); it++) {
+//      switch (it->op()) {
+//      case TxRequest_Request::GET: {
+//        int getkey = it->key1();
+//        ++num;
+//        string str = "get " + int2string(getkey);
+//        int pos = getPos(getkey);
+//        operationsWakeup.insert(pos);
+//        (operations[pos]).push(str);
+//        break;
+//      }
+//      case TxRequest_Request::PUT: {
+//        int putkey = it->key1();
+//        string value = it->value();
+//        ++num;
+//        string str = "put " + int2string(putkey) + " " + value;
+//        int pos = getPos(putkey);
+//        operationsWakeup.insert(pos);
+//        (operations[pos]).push(str);
+//        break;
+//      }
+//      case TxRequest_Request::GETRANGE: {
+//        int minkey = it->key1();
+//        int maxkey = it->key2();
+//        // number and split
+//        int posMin = getPos(minkey);
+//        int posMax = getPos(maxkey);
+//        num += posMax - posMin + 1;
+//        // Split getRange
+//        string str = "getRange ";
+//        if (posMin != posMax) {
+//          (operations[posMin]).push(str + int2string(minkey) + " " + int2string(posMin * size - 1));
+//          operationsWakeup.insert(posMin);
+//          (operations[posMax]).push(str + int2string((posMax - 1) * size) + " " + int2string(maxkey));
+//          operationsWakeup.insert(posMax);
+//        } else {
+//          operations[posMin].push(str + int2string(minkey) + " " + int2string(maxkey));
+//          operationsWakeup.insert(posMin);
+//        }
+//
+//        for (int i = posMin + 1; i < posMax; ++i) {
+//          operationsWakeup.insert(i);
+//          (operations[i]).push(str + int2string((i - 1) * size ) + " " + int2string(i * size - 1));
+//        }
+//        break;
+//      }
+//      }
+//
+//      operations_con.notify_all();
+//      while (num > 0) {
+//        Debug("Split request and sleep.\n");
+//        request_con.wait(lock);
+//      }
+//
+//      Debug("execTx wakeup and enter deal with results.\n");
+//      // Deal with results
+//      RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
+//      for(it = reqs.begin(); it != reqs.end(); it++) {
+//        Debug("execTx: Op " << it->op() << endl);
+//        switch (it->op()) {
+//        case TxRequest_Request::GET: {
+//          int getkey = it->key1();
+//          TxResponse_Map* ret = response->add_retvalue();
+//          ret->set_key(getkey);
+//          ret->set_value(reGet[getkey]);
+//          Debug("execTx: return GET ( " << getkey << ", " << reGet[getkey] << ")");
+//          break;
+//        }
+//        case TxRequest_Request::PUT: {
+//
+//          break;
+//        }
+//        case TxRequest_Request::GETRANGE: {
+//            int minkey = it->key1();
+//            int maxkey = it->key2();
+//            minMaxV.push_back(make_pair(minkey, maxkey));
+//            vector<string> v = reGetRange[make_pair(minkey, maxkey)];
+//            for (int i = 0; i < v.size(); ++i) {
+//              TxResponse_Map * ret = response->add_retvalue();
+//              ret->set_key(i + minkey);
+//              ret->set_value(v[i]);
+//            }
+//            break;
+//          }
+//        } // end switch
+//      } // end for
+//    } // end scope
+//
+//    // clear all
+//    initialize();
+//    Debug("execTx done and return values.\n");
+//    done->Run();
+//  }
 }
 
 void Coordinator::processResults() {

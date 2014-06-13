@@ -21,7 +21,7 @@ namespace Kevin {
     void commit();
   private:
     TxRequest current_request;
-    map<int,string> cache;
+    bool istx;
   };
 }
 #endif

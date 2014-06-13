@@ -26,7 +26,7 @@ public:
   Coordinator(int worker_num, int down, int up);
   void start();
 	~Coordinator();
-	void get(RpcController* controller,GetRequest* request,GetResponse* response,Closure* done)
+	void get(RpcController* controller,GetRequest* request,GetResponse* response,Closure* done);
     void put(RpcController* controller,PutRequest* request,PutResponse* response,Closure* done);
     void getrange(RpcController* controller,GRRequest* request,GRResponse* response,Closure* done);
     void execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done);
