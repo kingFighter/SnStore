@@ -26,7 +26,9 @@ public:
   Coordinator(int worker_num, int down, int up);
   void start();
 	~Coordinator();
-	void begin(RpcController* controller, const BeginRequest* request, BeginResponse* response, Closure* done);
+	void get(RpcController* controller,GetRequest* request,GetResponse* response,Closure* done)
+    void put(RpcController* controller,PutRequest* request,PutResponse* response,Closure* done);
+    void getrange(RpcController* controller,GRRequest* request,GRResponse* response,Closure* done);
     void execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done);
 
 private:
@@ -39,7 +41,7 @@ private:
     int down;
     int up;
     /* size = (up - down) / (worker_num - 2) */
-    int size; 
+    int size;
     /* the request number */
     int num;
     vector<Worker> workers;
@@ -56,7 +58,7 @@ private:
     /*   put false/true */
     /*   getRange minKey maxKey value1 value2 ..  */
     vector<queue<string> > results;
-    
+
     /* get values and out of order */
     map<int, string> reGet;
     /* getRange values  and out of  order */
