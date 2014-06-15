@@ -20,8 +20,6 @@ public:
     void execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done);
 
 private:
-//	thread[] workerThreads;
-//
-//	int local_execTx(std::string args, Transaction r);
+	Worker* workers;
 };
 #endif
