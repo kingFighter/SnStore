@@ -3,15 +3,20 @@
 #include <boost/thread/thread.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 #include "request.hpp"
+#include "requestQueue.hpp"
 
 class Worker {
 public:
-	Worker();
+	typedef boost::shared_ptr<Request> RequestPtr;
+	Worker(int begin_, int end_, RequestQueue::QueueType type);
 	~Worker();
-	bool pushRequest(Request& r);
+	void pushRequest(RequestPtr r);
 private:
+	void processRequest();
+	int begin;
+	int end;
 	boost::thread thread_t;
-	boost::lockfree::spsc_queue<int, boost::lockfree::capacity<1024> > request_queue;		
+	RequestQueue requestQueue;
 	std::string* data;
 };
 

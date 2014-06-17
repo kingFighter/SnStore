@@ -1,16 +1,19 @@
 #include "request.hpp"
 
-Request::Request(Transaction& t) {
+Request::Request(boost::shared_ptr<Transaction> t) : tx(t){
 }
 
-Request::Request(Request& r) {
+void Request::addResult(int key, const std::string& value) {
+	tx -> addResult(key, value);
 }
 
-Request::Request() {
+void Request::pushOperation(const Operation& o) {
+	operations.push(o);
 }
 
-void Request::putResult(int key, const std::string& value) {
+const Request::Operation Request::popOperation() {
+	Operation pop = operations.front();
+	operations.pop();
+	return pop;
 }
 
-void Request::addOperation(const Operation& o) {
-}

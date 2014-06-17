@@ -1,13 +1,35 @@
 #include "worker.hpp"
+#include "requestQueueFactory.hpp"
 
-Worker::Worker() {
+Worker::Worker(int begin_, int end_, RequestQueue::QueueType type) {
+	begin = begin_;
+	end = end_;
+	requestQueue = RequestQueueFactory::createRequestQueue(type);
 }
 
 Worker::~Worker() {
 }
 
-bool Worker::pushRequest(Request& r) {
-	return true;
+void Worker::pushRequest(RequestPtr r) {
+	requestQueue.push(r);
+}
+
+void Worker::processRequest() {
+	while (true) {
+		RequestPtr curRequest;
+		curRequest = requestQueue.pop();
+		const Request::Operation curOp = curRequest -> popOperation();
+		switch (curOp.type) {
+			case Request::GET:
+				break;
+			case Request::PUT:
+				break;
+			case Request::GETRANGE:
+				break;
+			default:
+				break;
+		}
+	}
 }
 /*
 #include "worker.h"

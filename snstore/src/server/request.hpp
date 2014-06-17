@@ -3,12 +3,16 @@
 #include "transaction.hpp" 
 #include <vector> 
 #include <string>
+#include <queue>
+#include <boost/shared_ptr.hpp>
 
 class Request {
+public:
+	typedef boost::shared_ptr<Transaction> TransactionPtr;
 enum Type {
-	get = 0,
-	put,
-	getRange
+	GET = 0,
+	PUT,
+	GETRANGE
 };
 
 struct Operation {
@@ -19,15 +23,14 @@ struct Operation {
 	int min;
 };
 
-public:
-	Request(Transaction& t);
-	Request();
-	Request(Request& r);
-	void addOperation(const Operation& o);
-	void putResult(int key, const std::string& value);
+	Request(TransactionPtr t);
+
+	void pushOperation(const Operation& o);
+	void addResult(int key, const std::string& value);
+	const Operation popOperation();
 private:
-	Transaction tx;
-	std::vector<Operation> operations;
+	TransactionPtr tx;
+	std::queue<Operation> operations;
 };
 
 #endif

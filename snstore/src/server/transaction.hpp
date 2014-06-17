@@ -7,11 +7,15 @@
 
 class Transaction {
 public:
-	Transaction();
-	Transaction(Transaction& t);
-	std::map<int, std::string> results;
+	Transaction(int size_);
+	void addResult(int key, std::string value);
+	const std::map<int, std::string>& getResults();
+	
 private:
+	std::map<int, std::string> results;
 	boost::mutex mutex_t;
+	boost::condition_variable cond_t;
+	int size;
 };
 
 #endif
