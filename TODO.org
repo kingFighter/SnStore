@@ -1,8 +1,16 @@
 * Test
 ** Correctness Test
-*** transaction
-** Performance Test
-*** get/put
-*** getRange
-*** transaction
+*** transaction abort
 * Src
+** DbAPI
+1. clear
+2. abort
+** transaction
+improvement
+** Others
+1. coordinate state clear after each transaction
+2. server cache to improvement performance
+* Bugs
+1. return not existing value bugs(A:define format)
+2. operations elements(same get, different id)(A:define format)
+3. ordinary put,get handle.(distinguish transaction)

@@ -7,35 +7,3 @@ For simplicity, it can be a Key-Value store with "get"/"getRange" and
 The DB is built on a single multi-core machine.
 
 Every thread is responsible for a partition of the whole key range.
-
-* Linux
-** install the prerequisites
-
-follow the instruction http://www.deltavsoft.com/RCFProto/distro/unix/cpp.html
-
-** code blocks config
-
-set Define RCF_USE_ZLIB RCF_USE_OPENSSL
-
-include files cpp/src cpp/src/RCF/include cpp/src/RCF/src/RCF
-
-link libraries pthread protobuf dl
-
-build option client -- test.cpp; server -- server.cpp
-* Windows
-** install the prerequisites
-follow the instruction http://www.deltavsoft.com/RCFProto/distro/windows/cpp.html
-** Visual Studio 2010 config
-   View->Property Pages
-1. VC++ Directories
-   1. Include Directories:
-   boost_1_55_0;protobuf-2.5.0\src;RCFProto-src-1.0.0.1\cpp\src;RCFProto-src-1.0.0.1\cpp\src\RCF\include;RCF-2.0.1.100\src\RCF
-2. Linker
-   1. General-Additional Library Directories:
-   protobuf-2.5.0\vsprojects\Debug
-   2. Input-Additional Dependencies:
-   protobuf-2.5.0\vsprojects\Debug\libprotobuf.lib
-** Problem
-1. 'WinSock.h has already been include' or 'XX redefine' etc.
-   C/C++-Preprocessor-Preprocessor Definitions:
-   WIN32_LEAN_AND_MEAN
