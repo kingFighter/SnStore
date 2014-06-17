@@ -7,9 +7,12 @@
 
 class Transaction {
 public:
-	Transaction(int size_);
+	Transaction();
 	void addResult(int key, std::string value);
 	const std::map<int, std::string>& getResults();
+	void wait();
+	void done();
+	void pushOp();
 	
 private:
 	std::map<int, std::string> results;

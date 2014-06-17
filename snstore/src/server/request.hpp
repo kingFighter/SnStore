@@ -19,15 +19,20 @@ struct Operation {
 	Type type;
 	int key;
 	std::string value;
-	int max;
-	int min;
+	int begin;
+	int end;
 };
 
 	Request(TransactionPtr t);
+	static Operation createGetOp(int key);
+	static Operation createPutOp(int key, const std::string& value);
+	static Operation createGetRangeOp(int begin, int end);
 
-	void pushOperation(const Operation& o);
-	void addResult(int key, const std::string& value);
-	const Operation popOperation();
+	void pushOp(const Operation& o);
+	void addResult(int key, const std::string value);
+	void done();
+	const Operation popOp();
+	bool empty();
 private:
 	TransactionPtr tx;
 	std::queue<Operation> operations;

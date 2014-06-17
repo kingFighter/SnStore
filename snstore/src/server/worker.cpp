@@ -5,6 +5,8 @@ Worker::Worker(int begin_, int end_, RequestQueue::QueueType type) {
 	begin = begin_;
 	end = end_;
 	requestQueue = RequestQueueFactory::createRequestQueue(type);
+	data = new std::string[end - begin];
+  	thread_t = boost::thread(&Worker::processRequest, this);
 }
 
 Worker::~Worker() {
@@ -18,16 +20,26 @@ void Worker::processRequest() {
 	while (true) {
 		RequestPtr curRequest;
 		curRequest = requestQueue.pop();
-		const Request::Operation curOp = curRequest -> popOperation();
-		switch (curOp.type) {
-			case Request::GET:
-				break;
-			case Request::PUT:
-				break;
-			case Request::GETRANGE:
-				break;
-			default:
-				break;
+		while (!curRequest -> empty()) {
+			const Request::Operation curOp = curRequest -> popOp();
+			switch (curOp.type) {
+				case Request::GET:
+					curRequest -> addResult(curOp.key, data[curOp.key - begin]);
+//					std::cout << "add result, key: " << curOp.key << ", " << "value: " << data[curOp.key - begin] << std::endl;
+					break;
+				case Request::PUT:
+					data[curOp.key - begin] = curOp.value;
+					break;
+				case Request::GETRANGE:
+					for (int i = curOp.begin - begin; i <= curOp.end - begin; i++)  {
+						curRequest -> addResult(i + begin, data[i]);	
+//						std::cout << "add result, key: " << i + begin << ", " << "value: " << data[i] << std::endl;
+					}
+					break;
+				default:
+					break;
+			}
+			curRequest -> done();
 		}
 	}
 }
