@@ -9,9 +9,9 @@ class Transaction {
 public:
 	Transaction();
 	Transaction(Transaction& t);
+	std::map<int, std::string> results;
 private:
-//	std::map<int, std::string> results;
-//	boost::mutex mutex_t;
+	boost::mutex mutex_t;
 };
 
 #endif

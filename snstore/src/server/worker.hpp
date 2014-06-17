@@ -8,7 +8,7 @@ class Worker {
 public:
 	Worker();
 	~Worker();
-	void pushRequest(Request& r);
+	bool pushRequest(Request& r);
 private:
 	boost::thread thread_t;
 	boost::lockfree::spsc_queue<int, boost::lockfree::capacity<1024> > request_queue;		

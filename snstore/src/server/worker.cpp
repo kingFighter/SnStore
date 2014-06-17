@@ -6,7 +6,8 @@ Worker::Worker() {
 Worker::~Worker() {
 }
 
-void Worker::pushRequest(Request& r) {
+bool Worker::pushRequest(Request& r) {
+	return true;
 }
 /*
 #include "worker.h"
