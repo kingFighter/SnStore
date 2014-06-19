@@ -48,7 +48,41 @@ Coordinator::put(RpcController* controller,PutRequest* request,PutResponse* resp
 void
 Coordinator::getrange(RpcController* controller,GRRequest* request,GRResponse* response,Closure* done)
 {
+  boost::mutex::scoped_lock lock(global_mutex);
+  int32 start = request->start();
+  int32 end = request->end();
+  int startPos = pos(start);
+  int endPos = pos(end);
 
+  TransactionPtr tx = TransactionPtr(new Transaction());
+
+  if (startPos == endPos) {
+    RequestPtr r = RequestPtr(new Request(tx));
+    r -> pushOp(Request::createGetRangeOp(start, end));
+    workers[startPos]->pushRequest(r);
+  } else {
+    RequestPtr r = RequestPtr(new Request(tx));
+    r -> pushOp(Request::createGetRangeOp(start, startPos * size + down - 1));
+    workers[startPos]->pushRequest(r);
+    
+    for (int i = startPos + 1; i < endPos; ++i) {
+      RequestPtr r = RequestPtr(new Request(tx));
+      r -> pushOp(Request::createGetRangeOp(down + i * size, down + (i + 1) * size - 1));
+      workers[startPos]->pushRequest(r);
+    }
+
+    RequestPtr r2 = RequestPtr(new Request(tx));
+    r2 -> pushOp(Request::createGetRangeOp(down + endPos * size, end));
+    workers[startPos]->pushRequest(r2);
+  }
+
+  tx->wait();
+  std::map<int, std::string> m = tx -> getResults();
+  std::map<int, std::string>::iterator it = m.begin();
+  for (; it != m.end(); ++it) {
+    response->add_value(it->second);
+  }
+  done->Run();
 }
 
 
