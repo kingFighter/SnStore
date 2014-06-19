@@ -1,7 +1,7 @@
 #include "../src/server/coordinator.h"
 
 int main() {
-  Coordinator coor(5,1, 150);//initial for test
+  Coordinator coor(5,1, 100);//initial for test
     try
     {
         // Initialize RCFProto.
@@ -16,7 +16,6 @@ int main() {
         // Start the server.
         server.start();
         
-        coor.start();
         // Wait for clients.
         std::cout << "Press Enter to exit." << std::endl;
         std::cin.get();
