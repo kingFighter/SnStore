@@ -17,7 +17,7 @@ Coordinator::~Coordinator()
 }
 
 void
-Coordinator::get(RpcController* controller,GetRequest* request,GetResponse* response,Closure* done)
+Coordinator::get(RpcController* controller,const GetRequest* request,GetResponse* response,Closure* done)
 {
   int32 key = request->key();
   TransactionPtr tx = TransactionPtr(new Transaction());
@@ -31,7 +31,7 @@ Coordinator::get(RpcController* controller,GetRequest* request,GetResponse* resp
 }
 
 void
-Coordinator::put(RpcController* controller,PutRequest* request,PutResponse* response,Closure* done)
+Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse* response,Closure* done)
 {
   int32 key = request->key();
   string value = request->value();
@@ -46,7 +46,7 @@ Coordinator::put(RpcController* controller,PutRequest* request,PutResponse* resp
 }
 
 void
-Coordinator::getrange(RpcController* controller,GRRequest* request,GRResponse* response,Closure* done)
+Coordinator::getrange(RpcController* controller,const GRRequest* request,GRResponse* response,Closure* done)
 {
   boost::mutex::scoped_lock lock(global_mutex);
   int32 start = request->start();
@@ -64,7 +64,7 @@ Coordinator::getrange(RpcController* controller,GRRequest* request,GRResponse* r
     RequestPtr r = RequestPtr(new Request(tx));
     r -> pushOp(Request::createGetRangeOp(start, startPos * size + down - 1));
     workers[startPos]->pushRequest(r);
-    
+
     for (int i = startPos + 1; i < endPos; ++i) {
       RequestPtr r = RequestPtr(new Request(tx));
       r -> pushOp(Request::createGetRangeOp(down + i * size, down + (i + 1) * size - 1));
