@@ -19,6 +19,11 @@ namespace Kevin {
     vector<string> getRange(int minkey, int maxkey);
     void beginTx();
     void commit();
+    //Asynchronous remote call.
+    void get_async(int key);
+    void put_async(int key, string value);
+    void getRange_async(int minkey, int maxkey);
+    void commit_async();
   private:
     TxRequest current_request;
     bool istx;
