@@ -18,7 +18,7 @@ namespace Kevin {
     void put(int key, string value);
     vector<string> getRange(int minkey, int maxkey);
     void beginTx();
-    void commit();
+    map<int,string> commit();
     //Asynchronous remote call.
     void get_async(int key);
     void put_async(int key, string value);

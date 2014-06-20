@@ -27,7 +27,7 @@ void testPerformance();
 int main() {
   testCorrectness();
   testPerformance();
-  
+
   return 0;
 }
 

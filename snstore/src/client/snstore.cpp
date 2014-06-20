@@ -96,10 +96,11 @@ void SnStore::beginTx()
     istx = true;
 }
 
-void SnStore::commit()
+map<int,string> SnStore::commit()
 {
+    map<int,string> m;
     if (!istx)
-        return;
+        return m;
 
     //call rpc to execute transaction
     try
@@ -124,16 +125,19 @@ void SnStore::commit()
 
         RepeatedPtrField<TxResponse_Map> rst = response.retvalue();
         RepeatedPtrField<TxResponse_Map>::iterator it = rst.begin();
-        for(; it != rst.end(); it++)
-          Debug(it->key()<<","<<it->value()<<std::endl);
+        for(; it != rst.end(); it++) {
+            m[it->key()] = it->value();
+            Debug(it->key()<<","<<it->value()<<std::endl);
+        }
         current_request.clear_reqs();
         istx = false;
+        return m;
     }
     catch(const RCF::Exception & e)
     {
         Debug("RCF::Exception: " << e.getErrorString() << std::endl);
         current_request.clear_reqs();
-        return ;
+        return m;
     }
 }
 
