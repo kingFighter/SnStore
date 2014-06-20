@@ -112,7 +112,7 @@ map<int,string> SnStore::commit()
         std::string strRequest;
         TextFormat::PrintToString(current_request, &strRequest);
         Debug("Sending request:" << std::endl);
-        Debug("strRequest << std::endl");
+        Debug(strRequest << std::endl);
 
         // Make a synchronous remote call to server.
         stub.execTx(NULL,&current_request, &response, NULL);
