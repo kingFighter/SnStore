@@ -25,29 +25,8 @@ void testCorrectness();
 void testPerformance();
 
 int main() {
-  // testCorrectness();
-  // testPerformance();
-  SnStore db;
-  int key = 21;
-  string value = "1";
-  map<int, string> results;
-  db.put(21, "1");
-  db.put(22, "1");
-  db.put(32, "1");
-  db.put(93, "2");
-  db.beginTx();
-  db.getRange(21, 93);
-  results = db.commit();
-  // end commit
-  vector<string> r = db.getRange(21, 93);
-  for (int i = 21; i <= 93; i++) {
-    if (r[i - 21] != results[i]) {
-      cout << r[i - 21] << " " << results[i] << endl;
-    }
-  }
-  
-  
-
+  testCorrectness();
+  testPerformance();
   
   return 0;
 }
@@ -220,11 +199,7 @@ void testCorrectness() {
   db.getRange(testKeyMin, testKeyMax);
   results = db.commit();
   rangeValue = db.getRange(testKeyMin, testKeyMax);
-  cout << testKeyMin << " " << testKeyMax << endl;
   for (int i = testKeyMin; i <= testKeyMax; ++i) {
-    // cout << "i : " << i << endl;
-    // cout << "Expected: " << rangeValue[i - testKeyMin] << endl;
-    // cout << "Results: " << results[i] << endl;
     if (rangeValue[i - testKeyMin] != results[i]) {
       cout << "i : " << i << endl;
       cout << "Expected: " << rangeValue[i - testKeyMin] << endl;

@@ -149,8 +149,8 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
   tx->wait();
   std::map<int, std::string> m = tx -> getResults();
   std::map<int, std::string>::iterator it2 = m.begin();
-  TxResponse_Map * ret = response->add_retvalue();
-  for (; it2 != m.end(); ++it) {
+  for (; it2 != m.end(); ++it2) {
+    TxResponse_Map * ret = response->add_retvalue();
     ret->set_key(it2->first);
     ret->set_value(it2->second);
   }
