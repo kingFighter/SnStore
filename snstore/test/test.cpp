@@ -25,9 +25,30 @@ void testCorrectness();
 void testPerformance();
 
 int main() {
-  testCorrectness();
-  testPerformance();
+  // testCorrectness();
+  // testPerformance();
+  SnStore db;
+  int key = 21;
+  string value = "1";
+  map<int, string> results;
+  db.put(21, "1");
+  db.put(22, "1");
+  db.put(32, "1");
+  db.put(93, "2");
+  db.beginTx();
+  db.getRange(21, 93);
+  results = db.commit();
+  // end commit
+  vector<string> r = db.getRange(21, 93);
+  for (int i = 21; i <= 93; i++) {
+    if (r[i - 21] != results[i]) {
+      cout << r[i - 21] << " " << results[i] << endl;
+    }
+  }
+  
+  
 
+  
   return 0;
 }
 
@@ -164,7 +185,7 @@ void testCorrectness() {
   // We can replace the testKeyMin, testKeyMax if needed
   int testKeyMin = minKey;
   int testKeyMax = maxKey;
-  rangeValue = db.getRange(testKeyMin, testKeyMax);
+  
   // begin tx
   int len = rand() % VALUE_LEN_LIMIT + 1;
   string value = genRandomString(len);
@@ -174,9 +195,11 @@ void testCorrectness() {
   db.put(key, value);
   db.put(key + 2, value);
   db.get(key);
+  db.get(key + 2);
   db.getRange(testKeyMin, testKeyMax);
   results = db.commit();
   // end commit
+  rangeValue = db.getRange(testKeyMin, testKeyMax);
   v = db.get(key);
   if (!expect(v, results[key])) {
     failRed("Test get/put failed\n");
@@ -192,13 +215,23 @@ void testCorrectness() {
   } else {
     passGreen("Test get/put2 passed\n");
   }
-
+  
+  db.beginTx();
+  db.getRange(testKeyMin, testKeyMax);
+  results = db.commit();
+  rangeValue = db.getRange(testKeyMin, testKeyMax);
+  cout << testKeyMin << " " << testKeyMax << endl;
   for (int i = testKeyMin; i <= testKeyMax; ++i) {
+    // cout << "i : " << i << endl;
+    // cout << "Expected: " << rangeValue[i - testKeyMin] << endl;
+    // cout << "Results: " << results[i] << endl;
     if (rangeValue[i - testKeyMin] != results[i]) {
-      failRed("Test getRange failed\n");
+      cout << "i : " << i << endl;
+      cout << "Expected: " << rangeValue[i - testKeyMin] << endl;
+      cout << "Results: " << results[i] << endl;
+      
       passed = false;
-    } else {
-      passGreen("Test getRange passed\n");
+      break;
     }
   }
 

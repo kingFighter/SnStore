@@ -95,38 +95,33 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
   RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
   RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
   boost::mutex::scoped_lock lock(global_mutex);
+  TransactionPtr tx = TransactionPtr(new Transaction());
   for(;it != reqs.end(); it++) {
     switch (it->op()) {
     case TxRequest_Request::GET: {
+      cout << "GET" << endl;
       int32 key = it->key1();
-      TransactionPtr tx = TransactionPtr(new Transaction());
       RequestPtr r = RequestPtr(new Request(tx));
       r -> pushOp(Request::createGetOp(key));
       workers[pos(key)]->pushRequest(r);
-      tx->wait();
-      std::map<int, std::string> m = tx -> getResults();
-      TxResponse_Map * ret = response->add_retvalue();
-      ret->set_key(key);
-      ret->set_value(m[key]);
       break;
     }
     case TxRequest_Request::PUT: {
+      cout << "PUT" << endl;
       int32 key = it->key1();
       string value = it->value();
-      TransactionPtr tx = TransactionPtr(new Transaction());
       RequestPtr r = RequestPtr(new Request(tx));
       r -> pushOp(Request::createPutOp(key, value));
       workers[pos(key)]->pushRequest(r);
-      tx->wait();
       // No response
       break;
     }
     case TxRequest_Request::GETRANGE: {
+      cout << "GETRANGE" << endl;
       int32 start = it->key1();
       int32 end = it->key2();
       int startPos = pos(start);
       int endPos = pos(end);
-      TransactionPtr tx = TransactionPtr(new Transaction());
 
       if (startPos == endPos) {
         RequestPtr r = RequestPtr(new Request(tx));
@@ -147,17 +142,18 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
         r2 -> pushOp(Request::createGetRangeOp(down + endPos * size, end));
         workers[endPos]->pushRequest(r2);
       }
-      tx->wait();
-      std::map<int, std::string> m = tx -> getResults();
-      std::map<int, std::string>::iterator it = m.begin();
-      TxResponse_Map * ret = response->add_retvalue();
-      for (; it != m.end(); ++it) {
-        ret->set_key(it->first);
-        ret->set_value(it->second);
-      }
       break;
     }
     }
   }
+  tx->wait();
+  std::map<int, std::string> m = tx -> getResults();
+  std::map<int, std::string>::iterator it2 = m.begin();
+  TxResponse_Map * ret = response->add_retvalue();
+  for (; it2 != m.end(); ++it) {
+    ret->set_key(it2->first);
+    ret->set_value(it2->second);
+  }
+
   done->Run();
 }
