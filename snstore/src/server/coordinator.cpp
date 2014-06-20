@@ -99,7 +99,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
   for(;it != reqs.end(); it++) {
     switch (it->op()) {
     case TxRequest_Request::GET: {
-      cout << "GET" << endl;
+      Debug("GET" << endl);
       int32 key = it->key1();
       RequestPtr r = RequestPtr(new Request(tx));
       r -> pushOp(Request::createGetOp(key));
@@ -107,7 +107,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
       break;
     }
     case TxRequest_Request::PUT: {
-      cout << "PUT" << endl;
+      Debug("PUT" << endl);
       int32 key = it->key1();
       string value = it->value();
       RequestPtr r = RequestPtr(new Request(tx));
@@ -117,7 +117,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
       break;
     }
     case TxRequest_Request::GETRANGE: {
-      cout << "GETRANGE" << endl;
+      Debug("GETRANGE" << endl);
       int32 start = it->key1();
       int32 end = it->key2();
       int startPos = pos(start);

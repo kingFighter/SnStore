@@ -17,7 +17,7 @@ void Transaction::done() {
 	boost::lock_guard<boost::mutex> lock_guard(mutex_t);
 	if (--size == 0)
 		cond_t.notify_one();
-        std::cout << "Transaction done size: " << size << std::endl;
+        // std::cout << "Transaction done size: " << size << std::endl;
 }
 
 const std::map<int, std::string>& Transaction::getResults() {
@@ -26,7 +26,7 @@ const std::map<int, std::string>& Transaction::getResults() {
 
 void Transaction::wait() {
 	boost::mutex::scoped_lock lock(mutex_t);
-	std::cout << "wait, size: " << size << std::endl;
+	// std::cout << "wait, size: " << size << std::endl;
 	if (size != 0)
 		cond_t.wait(lock);
 }

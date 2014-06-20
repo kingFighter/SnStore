@@ -5,15 +5,28 @@
 #include <algorithm>
 #include <ctime>
 #include <map>
+#include <sstream>
+#include <boost/thread.hpp>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 #include "../src/client/snstore.h"
 
-
 using namespace std;
 using namespace Kevin;
+
+
+class Tran {
+public:
+  void work(int n);
+  void start(int n);
+  void join();
+  bool getPass() const {return pass;}
+private:
+  boost::thread mThread;
+  bool pass;
+};
 
 string genRandomString(int);
 template <class T>
@@ -23,11 +36,13 @@ void failRed(const string&);
 void passGreen(const string&);
 void testCorrectness();
 void testPerformance();
+string number2String (int num);
+bool testTransaction();
 
 int main() {
   testCorrectness();
   testPerformance();
-  
+
   return 0;
 }
 
@@ -218,6 +233,22 @@ void testCorrectness() {
     allPassed = false;
   }
   cout << string(SENUM, '-') << endl << endl;
+
+  passed = true;
+  const int TIMES = 100;
+  for (int i = 0; i < 100; ++i) {
+    if (!testTransaction()) {
+      passed = false;
+      break;
+    }
+  }
+
+  if (passed) {
+    passGreen("Test mul transaction commit successful passed.\n");
+  } else {
+    failRed("Test mul transaction commit successful failed.\n");
+    allPassed = false;
+  }
   // End transaction
 
   if (allPassed) {
@@ -294,4 +325,57 @@ void testPerformance() {
   cout << "Time: " << totalTime << "s\n";
   cout << string(SENUM, '-') << endl << endl;
 
+}
+
+string number2String (int num) {
+   ostringstream ss;
+   ss << num;
+   return ss.str();
+}
+
+
+void Tran::work(int n) {
+  SnStore db;
+  string str = "thread" + number2String(n);
+  db.beginTx();
+  db.put(1, str);
+  db.put(2, str);
+  db.get(1);
+  db.get(2);
+  map<int, string> results = db.commit();
+  if (results[1] == str && results[2] == str) {
+    passGreen(str + " passed\n");
+    pass = true;
+  } else {
+    cout << "Excepted: " << str << endl;
+    cout << "Real: " << results[1] << ", " << results[2] << endl;
+    failRed(str + " failed.\n");
+    pass = false;
+  }
+}
+void Tran::start(int n) {
+    mThread = boost::thread(&Tran::work, this, n);
+}
+
+void Tran::join() {
+    mThread.join();
+}
+
+bool testTransaction() {
+   const int THREAD_NUM = 3;
+   Tran trs[THREAD_NUM];
+   bool re = true;
+   for (int i = 0; i < THREAD_NUM; ++i) {
+     trs[i].start(i);
+     trs[i].join();
+   }
+   
+   for (int i = 0; i < THREAD_NUM; ++i) {
+     if (!trs[i].getPass()) {
+       re = false;
+       break;
+     }
+   }
+   
+   return re;
 }
