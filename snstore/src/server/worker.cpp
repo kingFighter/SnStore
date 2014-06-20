@@ -5,7 +5,7 @@ Worker::Worker(int begin_, int end_, RequestQueue::QueueType type) {
 	begin = begin_;
 	end = end_;
 	requestQueue = RequestQueueFactory::createRequestQueue(type);
-	data = new std::string[end - begin];
+	data = new std::string[end - begin + 1];
   	thread_t = boost::thread(&Worker::processRequest, this);
 }
 

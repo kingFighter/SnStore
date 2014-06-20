@@ -63,18 +63,18 @@ Coordinator::getrange(RpcController* controller,const GRRequest* request,GRRespo
     workers[startPos]->pushRequest(r);
   } else {
     RequestPtr r = RequestPtr(new Request(tx));
-    r -> pushOp(Request::createGetRangeOp(start, startPos * size + down - 1));
+    r -> pushOp(Request::createGetRangeOp(start, (startPos + 1) * size + down - 1));
     workers[startPos]->pushRequest(r);
 
     for (int i = startPos + 1; i < endPos; ++i) {
       RequestPtr r = RequestPtr(new Request(tx));
       r -> pushOp(Request::createGetRangeOp(down + i * size, down + (i + 1) * size - 1));
-      workers[startPos]->pushRequest(r);
+      workers[i]->pushRequest(r);
     }
 
     RequestPtr r2 = RequestPtr(new Request(tx));
     r2 -> pushOp(Request::createGetRangeOp(down + endPos * size, end));
-    workers[startPos]->pushRequest(r2);
+    workers[endPos]->pushRequest(r2);
   }
 
   tx->wait();
@@ -82,6 +82,7 @@ Coordinator::getrange(RpcController* controller,const GRRequest* request,GRRespo
   std::map<int, std::string>::iterator it = m.begin();
   for (; it != m.end(); ++it) {
     response->add_value(it->second);
+    response->set_result(true);
   }
   done->Run();
 }
