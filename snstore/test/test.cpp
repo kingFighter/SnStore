@@ -156,99 +156,57 @@ void testCorrectness() {
   cout << string(SENUM, '-') << endl;
   cout << "Test transaction: \n";
   passed = true;
-  bool twoPassed = true;
   cout << string(SENUM, '+') << endl;
   cout << "Test transaction commit sucessful.\n";
   // transaction commit successful test
   int key = rand() % KEY_LIMIT;
   string v = db.get(key);
-  SnStore anotherDb;
   // We can replace the testKeyMin, testKeyMax if needed
   int testKeyMin = minKey;
   int testKeyMax = maxKey;
   rangeValue = db.getRange(testKeyMin, testKeyMax);
   // begin tx
-  db.beginTx();
-  // test get() before put()
-  cout << "Test get before put:\n";
-  if (!expect(v, db.get(key))) {
-    failRed("Test get before put failed\n");
-    passed = false;
-  } else {
-    passGreen("Test get before put passed.\n");
-  }
-
-  // test getRange in commit
-  if (db.getRange(testKeyMin, testKeyMax) != rangeValue) {
-    failRed("Test getRange in commit failed\n");
-    passed = false;
-  } else {
-    passGreen("Test getRange in commit passed\n");
-  }
   int len = rand() % VALUE_LEN_LIMIT + 1;
   string value = genRandomString(len);
+  map<int, string> results;
+  db.beginTx();
+  db.get(key);
   db.put(key, value);
-  string vv = db.get(key);
-  vector<string> inCommitRange = db.getRange(testKeyMin, testKeyMax);
-  // We cannot test whether put is updated by server before commit
-  // because this commit get lock.
-  db.commit();
+  db.put(key + 2, value);
+  db.get(key);
+  db.getRange(testKeyMin, testKeyMax);
+  results = db.commit();
   // end commit
-  // test get() after put()
   v = db.get(key);
-  if (!expect(v, vv)) {
-    failRed("Test get after put failed\n");
+  if (!expect(v, results[key])) {
+    failRed("Test get/put failed\n");
     passed = false;
   } else {
-    passGreen("Test get after put passed\n");
+    passGreen("Test get/put passed\n");
   }
 
-  rangeValue = db.getRange(testKeyMin, testKeyMax);
-  if (rangeValue != inCommitRange) {
-    failRed("Test getRange after commit failed\n");
+  v = db.get(key + 2);
+  if (!expect(v, results[key + 2])) {
+    failRed("Test get/put2 failed\n");
     passed = false;
   } else {
-    passGreen("Test getRange after commit passed\n");
+    passGreen("Test get/put2 passed\n");
   }
 
-  // test put after commit is saved by server
-  if (!expect(vv, anotherDb.get(key))) {
-    passed = false;
-    failRed("Test put after commit failed\n");
-  } else {
-    passGreen("Test put after commit passed\n");
+  for (int i = testKeyMin; i <= testKeyMax; ++i) {
+    if (rangeValue[i - testKeyMin] != results[i]) {
+      failRed("Test getRange failed\n");
+      passed = false;
+    } else {
+      passGreen("Test getRange passed\n");
+    }
   }
+
   cout << string(SENUM, '+') << endl;
   if (passed) {
     passGreen("Test transaction commit successful passed.\n");
   } else {
     failRed("Test transaction commit successful failed.\n");
-    twoPassed = false;
-    allPassed = false;
-  }
-  cout << string(SENUM, '+') << endl << endl;
-
-  passed = true;
-  cout << string(SENUM, '+') << endl;
-  cout << "Test transaction commit abort.\n";
-  // transaction commit abort test
-
-
-  cout << string(SENUM, '+') << endl;
-  if (passed) {
-    passGreen("Test transaction commit abort passed.\n");
-  } else {
-    failRed("Test transaction commit abort failed.\n");
-    allPassed = false;
-    twoPassed = false;
-  }
-  cout << string(SENUM, '+') << endl << endl;
-
-
-  if (twoPassed) {
-    passGreen("Test transaction passed.\n");
-  } else {
-    failRed("Test transaction failed.\n");
     allPassed = false;
   }
   cout << string(SENUM, '-') << endl << endl;
@@ -329,4 +287,3 @@ void testPerformance() {
   cout << string(SENUM, '-') << endl << endl;
 
 }
-
