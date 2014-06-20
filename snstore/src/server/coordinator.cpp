@@ -26,7 +26,7 @@ Coordinator::get(RpcController* controller,const GetRequest* request,GetResponse
   workers[pos(key)]->pushRequest(r);
   tx->wait();
   std::map<int, std::string> m = tx -> getResults();
-  response->set_value(m[0]);
+  response->set_value(m[key]);
   done->Run();
 }
 
@@ -35,6 +35,7 @@ Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse
 {
   int32 key = request->key();
   string value = request->value();
+//	std::cout << "Put Request!\nKey:" << key << "\nValue:" << value << "\n";
   TransactionPtr tx = TransactionPtr(new Transaction());
   RequestPtr r = RequestPtr(new Request(tx));
   r -> pushOp(Request::createPutOp(key, value));

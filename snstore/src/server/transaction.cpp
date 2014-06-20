@@ -14,6 +14,7 @@ void Transaction::addResult(int key, std::string value) {
 }
 
 void Transaction::done() {
+	boost::lock_guard<boost::mutex> lock_guard(mutex_t);
 	if (--size == 0)
 		cond_t.notify_one();
 }
