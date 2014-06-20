@@ -35,7 +35,7 @@ Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse
 {
   int32 key = request->key();
   string value = request->value();
-//	std::cout << "Put Request!\nKey:" << key << "\nValue:" << value << "\n";
+  //	std::cout << "Put Request!\nKey:" << key << "\nValue:" << value << "\n";
   TransactionPtr tx = TransactionPtr(new Transaction());
   RequestPtr r = RequestPtr(new Request(tx));
   r -> pushOp(Request::createPutOp(key, value));
@@ -49,7 +49,7 @@ Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse
 void
 Coordinator::getrange(RpcController* controller,const GRRequest* request,GRResponse* response,Closure* done)
 {
-  boost::mutex::scoped_lock lock(global_mutex);
+
   int32 start = request->start();
   int32 end = request->end();
   int startPos = pos(start);
@@ -62,6 +62,7 @@ Coordinator::getrange(RpcController* controller,const GRRequest* request,GRRespo
     r -> pushOp(Request::createGetRangeOp(start, end));
     workers[startPos]->pushRequest(r);
   } else {
+    boost::mutex::scoped_lock lock(global_mutex);
     RequestPtr r = RequestPtr(new Request(tx));
     r -> pushOp(Request::createGetRangeOp(start, (startPos + 1) * size + down - 1));
     workers[startPos]->pushRequest(r);
@@ -91,4 +92,72 @@ Coordinator::getrange(RpcController* controller,const GRRequest* request,GRRespo
 void
 Coordinator::execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done)
 {
+  RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
+  RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
+  boost::mutex::scoped_lock lock(global_mutex);
+  for(;it != reqs.end(); it++) {
+    switch (it->op()) {
+    case TxRequest_Request::GET: {
+      int32 key = it->key1();
+      TransactionPtr tx = TransactionPtr(new Transaction());
+      RequestPtr r = RequestPtr(new Request(tx));
+      r -> pushOp(Request::createGetOp(key));
+      workers[pos(key)]->pushRequest(r);
+      tx->wait();
+      std::map<int, std::string> m = tx -> getResults();
+      TxResponse_Map * ret = response->add_retvalue();
+      ret->set_key(key);
+      ret->set_value(m[key]);
+      break;
+    }
+    case TxRequest_Request::PUT: {
+      int32 key = it->key1();
+      string value = it->value();
+      TransactionPtr tx = TransactionPtr(new Transaction());
+      RequestPtr r = RequestPtr(new Request(tx));
+      r -> pushOp(Request::createPutOp(key, value));
+      workers[pos(key)]->pushRequest(r);
+      tx->wait();
+      // No response
+      break;
+    }
+    case TxRequest_Request::GETRANGE: {
+      int32 start = it->key1();
+      int32 end = it->key2();
+      int startPos = pos(start);
+      int endPos = pos(end);
+      TransactionPtr tx = TransactionPtr(new Transaction());
+
+      if (startPos == endPos) {
+        RequestPtr r = RequestPtr(new Request(tx));
+        r -> pushOp(Request::createGetRangeOp(start, end));
+        workers[startPos]->pushRequest(r);
+      } else {
+        RequestPtr r = RequestPtr(new Request(tx));
+        r -> pushOp(Request::createGetRangeOp(start, (startPos + 1) * size + down - 1));
+        workers[startPos]->pushRequest(r);
+
+        for (int i = startPos + 1; i < endPos; ++i) {
+          RequestPtr r = RequestPtr(new Request(tx));
+          r -> pushOp(Request::createGetRangeOp(down + i * size, down + (i + 1) * size - 1));
+          workers[i]->pushRequest(r);
+        }
+
+        RequestPtr r2 = RequestPtr(new Request(tx));
+        r2 -> pushOp(Request::createGetRangeOp(down + endPos * size, end));
+        workers[endPos]->pushRequest(r2);
+      }
+      tx->wait();
+      std::map<int, std::string> m = tx -> getResults();
+      std::map<int, std::string>::iterator it = m.begin();
+      TxResponse_Map * ret = response->add_retvalue();
+      for (; it != m.end(); ++it) {
+        ret->set_key(it->first);
+        ret->set_value(it->second);
+      }
+      break;
+    }
+    }
+  }
+  done->Run();
 }
