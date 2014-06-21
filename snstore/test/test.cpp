@@ -38,8 +38,12 @@ void testCorrectness();
 void testPerformance();
 string number2String (int num);
 bool testTransaction();
+void testThroughput();
 
 int main() {
+  // const int TRAN_NUM = 200;
+  // for (int i = 0; i < TRAN_NUM; ++i)
+  //   testThroughput();
   testCorrectness();
   testPerformance();
 
@@ -103,7 +107,7 @@ void testCorrectness() {
   /*  srand(time(NULL));*/
   cout << "Generate Random db key and values.\n";
   for (int i = 0; i < NUM; ++i) {
-    int key = rand() % KEY_LIMIT;
+    int key = rand() % KEY_LIMIT + 1;
     int len = rand() % VALUE_LEN_LIMIT + 1;
     string value = genRandomString(len);
     dbKV.insert(make_pair(key, value));
@@ -148,11 +152,13 @@ void testCorrectness() {
   int minKey = *min_element(dbKey.begin(),dbKey.end());
   int maxKey = *max_element(dbKey.begin(),dbKey.end());
   vector<string> rangeValue = db.getRange(minKey, maxKey);
-  int size = maxKey - minKey;
-  // cerr << dbKV.size() << " " << size << endl;
-  for (int i = 0; i <= size; ++i) {
+  int size = maxKey - minKey + 1;
+  cout << rangeValue.size() << " " << size << endl;
+  for (int i = 0; i < size; ++i) {
     // cerr << rangeValue[i] << " " << dbKV[i + minKey] << endl;
     if (rangeValue[i] != dbKV[i + minKey]) {
+      cout << "Expected: " << dbKV[i + minKey] << endl
+           << "Real: " << rangeValue[i] << endl;
       passed = false;
       break;
     }
@@ -174,7 +180,7 @@ void testCorrectness() {
   cout << string(SENUM, '+') << endl;
   cout << "Test transaction commit sucessful.\n";
   // transaction commit successful test
-  int key = rand() % KEY_LIMIT;
+  int key = rand() % KEY_LIMIT + 1;
   string v = db.get(key);
   // We can replace the testKeyMin, testKeyMax if needed
   int testKeyMin = minKey;
@@ -236,7 +242,7 @@ void testCorrectness() {
 
   passed = true;
   const int TIMES = 100;
-  for (int i = 0; i < 100; ++i) {
+  for (int i = 0; i < TIMES; ++i) {
     if (!testTransaction()) {
       passed = false;
       break;
@@ -308,12 +314,12 @@ void testPerformance() {
   start = clock();
   dbPer.beginTx();
   for (int i = 0; i < TEST_NUM; ++i) {
-    dbPer.get(rand() % KEY_LIMIT);
+    dbPer.get(rand() % KEY_LIMIT + 1);
     int len = rand() % VALUE_LEN_LIMIT + 1;
     string value = genRandomString(len);
-    dbPer.put(rand() % KEY_LIMIT, value);
-    int minKey = rand() % KEY_LIMIT;
-    int maxKey = rand() % KEY_LIMIT;
+    dbPer.put(rand() % KEY_LIMIT + 1, value);
+    int minKey = rand() % KEY_LIMIT + 1;
+    int maxKey = rand() % KEY_LIMIT + 1;
     if (minKey > maxKey)
       swap(minKey, maxKey);
     dbPer.getRange(minKey, maxKey);
@@ -378,4 +384,21 @@ bool testTransaction() {
    }
    
    return re;
+}
+
+void testThroughput() {
+  SnStore db;
+  const int KEY_LIMIT = 100;
+  const int VALUE_LEN_LIMIT = 10;
+  int key1 = rand() % KEY_LIMIT + 1;
+  int key2 = rand() % KEY_LIMIT + 1;
+  if (key1 > key2)
+    swap(key1, key2);
+  int len = rand() % VALUE_LEN_LIMIT + 1;
+  string value = genRandomString(len);
+  db.beginTx();
+  db.get(key1);
+  db.put(key1, value);
+  db.getRange(key1, key2);
+  db.commit();
 }

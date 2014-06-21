@@ -5,7 +5,7 @@
 // work[1]: [down + size, down + size * 2 - 1];
 // ...
 // work[workerNum - 1]: [up - size - 1, up]
-Coordinator::Coordinator(int workerNum_, int down_, int up_) : workerNum(workerNum_), down(down_), up(up_) {
+Coordinator::Coordinator(int workerNum_, int down_, int up_) : workerNum(workerNum_), down(down_), up(up_), totalTime(0), numExec(0) {
   size = (up - down + 1) / workerNum;
   for (int i = 0; i < workerNum; ++i) {
     workers.push_back(new Worker(down + i * size, down + (i + 1) * size - 1, RequestQueue::WAIT_FREE));
@@ -92,6 +92,8 @@ Coordinator::getrange(RpcController* controller,const GRRequest* request,GRRespo
 void
 Coordinator::execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done)
 {
+  clock_t start, finish;
+  start = clock();
   RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
   RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
   boost::mutex::scoped_lock lock(global_mutex);
@@ -156,4 +158,10 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
   }
 
   done->Run();
+  finish = clock();
+  totalTime += (double)(finish - start) / CLOCKS_PER_SEC;
+  ++numExec;
+  if (numExec == 200)
+    cout << "NumExec: " << numExec << ", totalTime: " << totalTime << endl
+          << "Throughput: " << numExec / totalTime  << " tran/s\n";
 }

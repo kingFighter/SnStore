@@ -48,5 +48,9 @@ private:
   int pos(int key) const {
     return (key - down) / size;
   }
+  /* below is used to test performance */
+  int numExec;
+  double totalTime;
+  
 };
 #endif
