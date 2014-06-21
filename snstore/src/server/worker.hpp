@@ -17,7 +17,7 @@ private:
 	int end;
 	boost::thread thread_t;
 	RequestQueue requestQueue;
-	std::string* data;
+	int* data;
 };
 
 #endif

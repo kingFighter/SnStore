@@ -10,7 +10,7 @@ struct Operation {
 	};
 	Type type;
 	int key;
-	std::string value;
+	int value;
 	int begin;
 	int end;
 };
@@ -22,7 +22,7 @@ static inline Operation createGetOp(int key) {
 	return op;
 }
 
-static inline Operation createPutOp(int key, const std::string& value) {
+static inline Operation createPutOp(int key, int value) {
 	Operation op;
 	op.type = Operation::PUT;
 	op.key = key;

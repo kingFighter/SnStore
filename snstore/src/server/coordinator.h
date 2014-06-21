@@ -23,7 +23,7 @@ typedef boost::shared_ptr<Request> RequestPtr;
 
 class Coordinator {
 public:
-  Coordinator(int workerNum, int down, int up);
+  Coordinator(int workerNum, int down, int up, RequestQueue::QueueType qt);
   ~Coordinator();
 /*
   void get(RpcController* controller,const GetRequest* request,GetResponse* response,Closure* done);
@@ -32,10 +32,10 @@ public:
   void execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done);
 
 */
-	std::string get(int key);
-	int put(int key, std::string value);
-	bool getRange(int begin, int end, std::map<int, std::string>& result);
-	bool execTx(std::vector<Operation> ops, std::map<int, std::string>& result);
+	int get(int key);
+	int put(int key, int value);
+	bool getRange(int begin, int end, std::map<int, int>& result);
+	bool execTx(std::vector<Operation> ops, std::map<int, int>& result);
 private:
   std::vector<Worker*> workers;
   /* the number of worker */
@@ -49,5 +49,6 @@ private:
   int pos(int key) const {
     return (key - down) / size;
   }
+  RequestQueue::QueueType qt;
 };
 #endif

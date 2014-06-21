@@ -4,7 +4,7 @@
 Request::Request(boost::shared_ptr<Transaction> t) : tx(t){
 }
 
-void Request::addResult(int key, const std::string value) {
+void Request::addResult(int key, int value) {
 	tx -> addResult(key, value);
 }
 
