@@ -1,5 +1,6 @@
 #include "worker.hpp"
 #include "requestQueueFactory.hpp"
+#include "../RCF/operation.hpp"
 
 Worker::Worker(int begin_, int end_, RequestQueue::QueueType type) {
 	begin = begin_;
@@ -21,16 +22,16 @@ void Worker::processRequest() {
 		RequestPtr curRequest;
 		curRequest = requestQueue.pop();
 		while (!curRequest -> empty()) {
-			const Request::Operation curOp = curRequest -> popOp();
+			const Operation curOp = curRequest -> popOp();
 			switch (curOp.type) {
-				case Request::GET:
+				case Operation::GET:
 					curRequest -> addResult(curOp.key, data[curOp.key - begin]);
 //					std::cout << "add result, key: " << curOp.key << ", " << "value: " << data[curOp.key - begin] << std::endl;
 					break;
-				case Request::PUT:
+				case Operation::PUT:
 					data[curOp.key - begin] = curOp.value;
 					break;
-				case Request::GETRANGE:
+				case Operation::GETRANGE:
 					for (int i = curOp.begin - begin; i <= curOp.end - begin; i++)  {
 						curRequest -> addResult(i + begin, data[i]);	
 //						std::cout << "add result, key: " << i + begin << ", " << "value: " << data[i] << std::endl;

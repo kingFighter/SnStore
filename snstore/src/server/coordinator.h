@@ -1,8 +1,6 @@
 #ifndef COORDINATOR_H
 #define COORDINATOR_H
 
-#include <RCFProto.hpp>
-#include "../RCFProto/snstore.pb.h"
 #include <map>
 #include <vector>
 #include <string>
@@ -15,28 +13,31 @@
 #include <algorithm>
 #include <iterator>
 
-#include <google/protobuf/text_format.h>
-
 #include "worker.hpp"
 #include "requestQueue.hpp"
 #include "transaction.hpp"
+#include "../RCF/operation.hpp"
 
 typedef boost::shared_ptr<Transaction> TransactionPtr;
 typedef boost::shared_ptr<Request> RequestPtr;
 
-using namespace google::protobuf;
-
-class Coordinator : public DbService{
+class Coordinator {
 public:
   Coordinator(int workerNum, int down, int up);
   ~Coordinator();
+/*
   void get(RpcController* controller,const GetRequest* request,GetResponse* response,Closure* done);
   void put(RpcController* controller,const PutRequest* request,PutResponse* response,Closure* done);
   void getrange(RpcController* controller,const GRRequest* request,GRResponse* response,Closure* done);
   void execTx(RpcController* controller, const TxRequest* request, TxResponse* response, Closure* done);
 
+*/
+	std::string get(int key);
+	int put(int key, std::string value);
+	bool getRange(int begin, int end, std::map<int, std::string>& result);
+	bool execTx(std::vector<Operation> ops, std::map<int, std::string>& result);
 private:
-  vector<Worker*> workers;
+  std::vector<Worker*> workers;
   /* the number of worker */
   int workerNum;
   /* down limit */

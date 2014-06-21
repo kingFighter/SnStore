@@ -13,7 +13,7 @@ void Request::pushOp(const Operation& o) {
 	tx -> pushOp();
 }
 
-const Request::Operation Request::popOp() {
+const Operation Request::popOp() {
 	Operation pop = operations.front();
 	operations.pop();
 	return pop;
@@ -28,6 +28,7 @@ bool Request::empty() {
 	return operations.empty();
 }
 
+/*
 Request::Operation Request::createGetOp(int key) {
 	Request::Operation op;
 	op.type = GET;
@@ -51,3 +52,4 @@ Request::Operation Request::createGetRangeOp(int begin, int end) {
 	return op;
 }
 
+*/
