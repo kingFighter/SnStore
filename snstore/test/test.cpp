@@ -28,6 +28,15 @@ private:
   bool pass;
 };
 
+class Throughput {
+public:
+  void work();
+  void start();
+  void join();
+private:
+  boost::thread mThread;
+};
+
 string genRandomString(int);
 template <class T>
 bool expect(const T&, const T&);
@@ -41,11 +50,9 @@ bool testTransaction();
 void testThroughput();
 
 int main() {
-  // const int TRAN_NUM = 200;
-  // for (int i = 0; i < TRAN_NUM; ++i)
-  //   testThroughput();
-  testCorrectness();
-  testPerformance();
+  testThroughput();
+  // testCorrectness();
+  // testPerformance();
 
   return 0;
 }
@@ -368,6 +375,34 @@ void Tran::join() {
     mThread.join();
 }
 
+void Throughput::work() {
+  SnStore db;
+  const int KEY_LIMIT = 100;
+  const int VALUE_LEN_LIMIT = 10;
+  int key1 = rand() % KEY_LIMIT + 1;
+  int key2 = rand() % KEY_LIMIT + 1;
+  if (key1 > key2)
+    swap(key1, key2);
+  int len = rand() % VALUE_LEN_LIMIT + 1;
+  string value = genRandomString(len);
+  // const int TIMES = 50;
+  // for (int i = 0;i < TIMES; ++i) {
+  while (true) {
+    // db.beginTx();
+    db.get(key1);
+    // db.put(key1, value);
+    // db.getRange(key1, key2);
+    // db.commit();
+  }
+}
+void Throughput::start() {
+  mThread = boost::thread(&Throughput::work, this);
+}
+
+void Throughput::join() {
+  mThread.join();
+}
+
 bool testTransaction() {
    const int THREAD_NUM = 3;
    Tran trs[THREAD_NUM];
@@ -388,18 +423,10 @@ bool testTransaction() {
 }
 
 void testThroughput() {
-  SnStore db;
-  const int KEY_LIMIT = 100;
-  const int VALUE_LEN_LIMIT = 10;
-  int key1 = rand() % KEY_LIMIT + 1;
-  int key2 = rand() % KEY_LIMIT + 1;
-  if (key1 > key2)
-    swap(key1, key2);
-  int len = rand() % VALUE_LEN_LIMIT + 1;
-  string value = genRandomString(len);
-  db.beginTx();
-  db.get(key1);
-  db.put(key1, value);
-  db.getRange(key1, key2);
-  db.commit();
+  const int THROUGH_NUM = 4;
+  Throughput ths[THROUGH_NUM];
+  for (int i = 0; i < THROUGH_NUM; ++i) {
+    ths[i].start();
+    ths[i].join();
+  }
 }

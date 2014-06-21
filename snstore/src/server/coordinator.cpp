@@ -19,6 +19,8 @@ Coordinator::~Coordinator()
 void
 Coordinator::get(RpcController* controller,const GetRequest* request,GetResponse* response,Closure* done)
 {
+  clock_t start, finish;
+  start = clock();
   int32 key = request->key();
   assert(key <= up && key >= down);
   TransactionPtr tx = TransactionPtr(new Transaction());
@@ -29,11 +31,21 @@ Coordinator::get(RpcController* controller,const GetRequest* request,GetResponse
   std::map<int, std::string> m = tx -> getResults();
   response->set_value(m[key]);
   done->Run();
+  finish = clock();
+  totalTime += (double)(finish - start) / CLOCKS_PER_SEC;
+  ++numExec;
+  if (numExec % 200 == 0)
+    cout << "NumExec: " << numExec << ", totalTime: " << totalTime << endl
+         << "Throughput: " << numExec / totalTime  << " tran/s\n";
+
 }
 
 void
 Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse* response,Closure* done)
 {
+  clock_t start, finish;
+  start = clock();
+
   int32 key = request->key();
   assert(key <= up && key >= down);
   string value = request->value();
@@ -46,6 +58,12 @@ Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse
   std::map<int, std::string> m = tx -> getResults();
   response->set_result(true);
   done->Run();
+  finish = clock();
+  totalTime += (double)(finish - start) / CLOCKS_PER_SEC;
+  ++numExec; 
+  if (numExec % 1000 == 0)
+    cout << "NumExec: " << numExec << ", totalTime: " << totalTime << endl
+         << "Throughput: " << numExec / totalTime  << " tran/s\n";
 }
 
 void
@@ -158,7 +176,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
       }
       }
     }
-
+  }
   tx->wait();
   std::map<int, std::string> m = tx -> getResults();
   std::map<int, std::string>::iterator it2 = m.begin();
@@ -172,7 +190,8 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
   finish = clock();
   totalTime += (double)(finish - start) / CLOCKS_PER_SEC;
   ++numExec;
-  if (numExec == 200)
+  if (numExec % 200 == 0)
     cout << "NumExec: " << numExec << ", totalTime: " << totalTime << endl
-         << "Throughput: " << numExec / totalTime  << " tran/s\n";
+          << "Throughput: " << numExec / totalTime  << " tran/s\n";
 }
+
