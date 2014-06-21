@@ -100,63 +100,65 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
   start = clock();
   RepeatedPtrField<TxRequest_Request> reqs = request->reqs();
   RepeatedPtrField<TxRequest_Request>::iterator it = reqs.begin();
-  boost::mutex::scoped_lock lock(global_mutex);
-  TransactionPtr tx = TransactionPtr(new Transaction());
-  for(;it != reqs.end(); it++) {
-    switch (it->op()) {
-    case TxRequest_Request::GET: {
-      Debug("GET" << endl);
-      int32 key = it->key1();
-      assert(key <= up && key >= down);      
-      RequestPtr r = RequestPtr(new Request(tx));
-      r -> pushOp(Request::createGetOp(key));
-      workers[pos(key)]->pushRequest(r);
-      break;
-    }
-    case TxRequest_Request::PUT: {
-      Debug("PUT" << endl);
-      int32 key = it->key1();
-      assert(key <= up && key >= down);
-      string value = it->value();
-      RequestPtr r = RequestPtr(new Request(tx));
-      r -> pushOp(Request::createPutOp(key, value));
-      workers[pos(key)]->pushRequest(r);
-      // No response
-      break;
-    }
-    case TxRequest_Request::GETRANGE: {
-      Debug("GETRANGE" << endl);
-      int32 start = it->key1();
-      int32 end = it->key2();
-      int startPos = pos(start);
-      int endPos = pos(end);
-      assert(start <= up && start >= down
-             && end <= up && end >= down 
-             && start <= end);
-
-      if (startPos == endPos) {
+  TransactionPtr tx = TransactionPtr(new Transaction()); 
+  {
+    boost::mutex::scoped_lock lock(global_mutex); 
+    for(;it != reqs.end(); it++) {
+      switch (it->op()) {
+      case TxRequest_Request::GET: {
+        Debug("GET" << endl);
+        int32 key = it->key1();
+        assert(key <= up && key >= down);      
         RequestPtr r = RequestPtr(new Request(tx));
-        r -> pushOp(Request::createGetRangeOp(start, end));
-        workers[startPos]->pushRequest(r);
-      } else {
-        RequestPtr r = RequestPtr(new Request(tx));
-        r -> pushOp(Request::createGetRangeOp(start, (startPos + 1) * size + down - 1));
-        workers[startPos]->pushRequest(r);
-
-        for (int i = startPos + 1; i < endPos; ++i) {
-          RequestPtr r = RequestPtr(new Request(tx));
-          r -> pushOp(Request::createGetRangeOp(down + i * size, down + (i + 1) * size - 1));
-          workers[i]->pushRequest(r);
-        }
-
-        RequestPtr r2 = RequestPtr(new Request(tx));
-        r2 -> pushOp(Request::createGetRangeOp(down + endPos * size, end));
-        workers[endPos]->pushRequest(r2);
+        r -> pushOp(Request::createGetOp(key));
+        workers[pos(key)]->pushRequest(r);
+        break;
       }
-      break;
+      case TxRequest_Request::PUT: {
+        Debug("PUT" << endl);
+        int32 key = it->key1();
+        assert(key <= up && key >= down);
+        string value = it->value();
+        RequestPtr r = RequestPtr(new Request(tx));
+        r -> pushOp(Request::createPutOp(key, value));
+        workers[pos(key)]->pushRequest(r);
+        // No response
+        break;
+      }
+      case TxRequest_Request::GETRANGE: {
+        Debug("GETRANGE" << endl);
+        int32 start = it->key1();
+        int32 end = it->key2();
+        int startPos = pos(start);
+        int endPos = pos(end);
+        assert(start <= up && start >= down
+               && end <= up && end >= down 
+               && start <= end);
+
+        if (startPos == endPos) {
+          RequestPtr r = RequestPtr(new Request(tx));
+          r -> pushOp(Request::createGetRangeOp(start, end));
+          workers[startPos]->pushRequest(r);
+        } else {
+          RequestPtr r = RequestPtr(new Request(tx));
+          r -> pushOp(Request::createGetRangeOp(start, (startPos + 1) * size + down - 1));
+          workers[startPos]->pushRequest(r);
+
+          for (int i = startPos + 1; i < endPos; ++i) {
+            RequestPtr r = RequestPtr(new Request(tx));
+            r -> pushOp(Request::createGetRangeOp(down + i * size, down + (i + 1) * size - 1));
+            workers[i]->pushRequest(r);
+          }
+
+          RequestPtr r2 = RequestPtr(new Request(tx));
+          r2 -> pushOp(Request::createGetRangeOp(down + endPos * size, end));
+          workers[endPos]->pushRequest(r2);
+        }
+        break;
+      }
+      }
     }
-    }
-  }
+
   tx->wait();
   std::map<int, std::string> m = tx -> getResults();
   std::map<int, std::string>::iterator it2 = m.begin();
@@ -172,5 +174,5 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
   ++numExec;
   if (numExec == 200)
     cout << "NumExec: " << numExec << ", totalTime: " << totalTime << endl
-          << "Throughput: " << numExec / totalTime  << " tran/s\n";
+         << "Throughput: " << numExec / totalTime  << " tran/s\n";
 }
