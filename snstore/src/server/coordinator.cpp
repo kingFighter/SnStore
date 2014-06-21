@@ -20,6 +20,7 @@ void
 Coordinator::get(RpcController* controller,const GetRequest* request,GetResponse* response,Closure* done)
 {
   int32 key = request->key();
+  assert(key <= up && key >= down);
   TransactionPtr tx = TransactionPtr(new Transaction());
   RequestPtr r = RequestPtr(new Request(tx));
   r -> pushOp(Request::createGetOp(key));
@@ -34,6 +35,7 @@ void
 Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse* response,Closure* done)
 {
   int32 key = request->key();
+  assert(key <= up && key >= down);
   string value = request->value();
   //	std::cout << "Put Request!\nKey:" << key << "\nValue:" << value << "\n";
   TransactionPtr tx = TransactionPtr(new Transaction());
@@ -54,7 +56,9 @@ Coordinator::getrange(RpcController* controller,const GRRequest* request,GRRespo
   int32 end = request->end();
   int startPos = pos(start);
   int endPos = pos(end);
-
+  assert(start <= up && start >= down
+         && end <= up && end >= down 
+         && start <= end);
   TransactionPtr tx = TransactionPtr(new Transaction());
 
   if (startPos == endPos) {
@@ -103,6 +107,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
     case TxRequest_Request::GET: {
       Debug("GET" << endl);
       int32 key = it->key1();
+      assert(key <= up && key >= down);      
       RequestPtr r = RequestPtr(new Request(tx));
       r -> pushOp(Request::createGetOp(key));
       workers[pos(key)]->pushRequest(r);
@@ -111,6 +116,7 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
     case TxRequest_Request::PUT: {
       Debug("PUT" << endl);
       int32 key = it->key1();
+      assert(key <= up && key >= down);
       string value = it->value();
       RequestPtr r = RequestPtr(new Request(tx));
       r -> pushOp(Request::createPutOp(key, value));
@@ -124,6 +130,9 @@ Coordinator::execTx(RpcController* controller, const TxRequest* request, TxRespo
       int32 end = it->key2();
       int startPos = pos(start);
       int endPos = pos(end);
+      assert(start <= up && start >= down
+             && end <= up && end >= down 
+             && start <= end);
 
       if (startPos == endPos) {
         RequestPtr r = RequestPtr(new Request(tx));

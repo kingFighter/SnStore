@@ -280,7 +280,7 @@ void testPerformance() {
   const int TEST_NUM = 100;
   cout << "Test put performance with " << TEST_NUM << " :\n";
   start = clock();
-  for (int i = 0; i < TEST_NUM; ++i) {
+  for (int i = 1; i <= TEST_NUM; ++i) {
     string value = genRandomString(rand() % 20 + 1);
     dbPer.put(i, value);
   }
@@ -292,7 +292,7 @@ void testPerformance() {
   cout << string(SENUM, '-') << endl;
   cout << "Test get performance with " << TEST_NUM << " :\n";
   start = clock();
-  for (int i = 0; i < TEST_NUM; ++i) {
+  for (int i = 1; i <= TEST_NUM; ++i) {
     dbPer.get(i);
   }
   finish = clock();
@@ -303,7 +303,7 @@ void testPerformance() {
   cout << string(SENUM, '-') << endl;
   cout << "Test getRange performance with " << TEST_NUM << " :\n";
   start = clock();
-  dbPer.getRange(0, TEST_NUM - 1);
+  dbPer.getRange(1, TEST_NUM);
   finish = clock();
   totalTime = (double)(finish - start) / CLOCKS_PER_SEC;
   cout << "Time: " << totalTime << "s\n";
@@ -330,7 +330,8 @@ void testPerformance() {
   totalTime = (double)(finish - start) / CLOCKS_PER_SEC;
   cout << "Time: " << totalTime << "s\n";
   cout << string(SENUM, '-') << endl << endl;
-
+  
+  cout << "Performance Test Over." << endl;
 }
 
 string number2String (int num) {
