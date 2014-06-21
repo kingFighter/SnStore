@@ -54,7 +54,7 @@ void onPut(RCF::RcfProtoController *pController, std::pair<PutRequest *, PutResp
 }
 
 void onGetRange(RCF::RcfProtoController *pController, std::pair<GRRequest *, GRResponse *> args) {
-    vector<string> v;
+    vector<int> v;
     if (pController->Failed()) {
         std::cout << "RPC error: " << pController->ErrorText() << std::endl;
     }
@@ -66,8 +66,8 @@ void onGetRange(RCF::RcfProtoController *pController, std::pair<GRRequest *, GRR
         TextFormat::PrintToString(*response, &strResponse);
         Debug("Received response:" << std::endl);
         Debug(strResponse << std::endl);
-        RepeatedPtrField<string> ret = response->value();
-        RepeatedPtrField<string>::iterator it = ret.begin();
+        RepeatedField<int> ret = response->value();
+        RepeatedField<int>::iterator it = ret.begin();
         for(; it != ret.end(); it++) {
             v.push_back(*it);
         }
@@ -96,9 +96,9 @@ void SnStore::beginTx()
     istx = true;
 }
 
-map<int,string> SnStore::commit()
+map<int,int> SnStore::commit()
 {
-    map<int,string> m;
+    map<int,int> m;
     if (!istx)
         return m;
 
@@ -173,12 +173,12 @@ void SnStore::commit_async() {
     }
 }
 
-string SnStore::get(int key) {
+int SnStore::get(int key) {
     if (istx) {
         TxRequest_Request * req = current_request.add_reqs();
         req->set_op(TxRequest_Request::GET);
         req->set_key1(key);
-        return "";
+        return -1;
     }
     try
     {
@@ -208,7 +208,7 @@ string SnStore::get(int key) {
     catch(const RCF::Exception & e)
     {
         Debug("RCF::Exception: " << e.getErrorString() << std::endl);
-        return "";
+        return -1;
     }
 }
 
@@ -245,7 +245,7 @@ void SnStore::get_async(int key) {
     }
 }
 
-void SnStore::put(int key, string value) {
+void SnStore::put(int key, int value) {
     if (istx) {//this is a transaction request
         TxRequest_Request * req = current_request.add_reqs();
         req->set_op(TxRequest_Request::PUT);
@@ -284,7 +284,7 @@ void SnStore::put(int key, string value) {
     }
 }
 
-void SnStore::put_async(int key, string value) {
+void SnStore::put_async(int key, int value) {
     if (istx) {//this is a transaction request
         TxRequest_Request * req = current_request.add_reqs();
         req->set_op(TxRequest_Request::PUT);
@@ -319,8 +319,8 @@ void SnStore::put_async(int key, string value) {
     }
 }
 
-vector<string> SnStore::getRange(int minkey, int maxkey) {
-    vector<string> v;
+vector<int> SnStore::getRange(int minkey, int maxkey) {
+    vector<int> v;
     if (istx) {//this is a transaction request
         TxRequest_Request * req = current_request.add_reqs();
         req->set_op(TxRequest_Request::GETRANGE);
@@ -351,8 +351,8 @@ vector<string> SnStore::getRange(int minkey, int maxkey) {
         TextFormat::PrintToString(rsponse, &strResponse);
         Debug("Received response:" << std::endl);
         Debug(strResponse << std::endl);
-        RepeatedPtrField<string> ret = rsponse.value();
-        RepeatedPtrField<string>::iterator it = ret.begin();
+        RepeatedField<int> ret = rsponse.value();
+        RepeatedField<int>::iterator it = ret.begin();
         for(; it != ret.end(); it++) {
             v.push_back(*it);
         }

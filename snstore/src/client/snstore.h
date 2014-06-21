@@ -14,14 +14,14 @@ namespace Kevin {
   class SnStore {
   public:
     SnStore();
-    string get(int key);
-    void put(int key, string value);
-    vector<string> getRange(int minkey, int maxkey);
+    int get(int key);
+    void put(int key, int value);
+    vector<int> getRange(int minkey, int maxkey);
     void beginTx();
-    map<int,string> commit();
+    map<int,int> commit();
     //Asynchronous remote call.
     void get_async(int key);
-    void put_async(int key, string value);
+    void put_async(int key, int value);
     void getRange_async(int minkey, int maxkey);
     void commit_async();
   private:
