@@ -9,6 +9,8 @@ int main() {
 
         // Create server.
         RCF::RcfProtoServer server( RCF::TcpEndpoint("0.0.0.0", 50001) );
+        RCF::ThreadPoolPtr threadPoolPtr( new RCF::ThreadPool(4) );
+        server.setThreadPool(threadPoolPtr);
 
         // Bind Protobuf service.
         server.bindService(coor);
