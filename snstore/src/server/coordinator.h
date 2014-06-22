@@ -20,6 +20,7 @@
 
 typedef boost::shared_ptr<Transaction> TransactionPtr;
 typedef boost::shared_ptr<Request> RequestPtr;
+using std::endl;
 
 class Coordinator {
 public:
