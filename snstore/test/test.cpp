@@ -387,11 +387,13 @@ void Throughput::work() {
   string value = genRandomString(len);
   // const int TIMES = 50;
   // for (int i = 0;i < TIMES; ++i) {
+  key1 = 1;
+  key2 = 41;
   while (true) {
     // db.beginTx();
-    db.get(key1);
+    // db.get(key1);
     // db.put(key1, value);
-    // db.getRange(key1, key2);
+    db.getRange(key1, key2);
     // db.commit();
   }
 }
@@ -423,7 +425,7 @@ bool testTransaction() {
 }
 
 void testThroughput() {
-  const int THROUGH_NUM = 4;
+  const int THROUGH_NUM = 1;
   Throughput ths[THROUGH_NUM];
   for (int i = 0; i < THROUGH_NUM; ++i) {
     ths[i].start();

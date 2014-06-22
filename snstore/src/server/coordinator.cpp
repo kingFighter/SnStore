@@ -61,7 +61,7 @@ Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse
   finish = clock();
   totalTime += (double)(finish - start) / CLOCKS_PER_SEC;
   ++numExec; 
-  if (numExec % 1000 == 0)
+  if (numExec % 200 == 0)
     cout << "NumExec: " << numExec << ", totalTime: " << totalTime << endl
          << "Throughput: " << numExec / totalTime  << " tran/s\n";
 }
@@ -69,6 +69,8 @@ Coordinator::put(RpcController* controller,const PutRequest* request,PutResponse
 void
 Coordinator::getrange(RpcController* controller,const GRRequest* request,GRResponse* response,Closure* done)
 {
+  clock_t startTime, finishTime;
+  startTime = clock();
 
   int32 start = request->start();
   int32 end = request->end();
@@ -107,6 +109,14 @@ Coordinator::getrange(RpcController* controller,const GRRequest* request,GRRespo
     response->add_value(it->second);
     response->set_result(true);
   }
+
+  finishTime = clock();
+  totalTime += (double)(finishTime - startTime) / CLOCKS_PER_SEC;
+  ++numExec; 
+  if (numExec % 200 == 0)
+    cout << "NumExec: " << numExec << ", totalTime: " << totalTime << endl
+         << "Throughput: " << numExec / totalTime  << " tran/s\n";
+
   done->Run();
 }
 
